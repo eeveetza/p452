@@ -40,6 +40,7 @@ dcr = 500; %km
 
 [d, h, zone] = test_profile(1);
 
+phi_path = (phi_t + phi_r)/2;
 
 pol = 1; %polarization vertical
 
@@ -50,7 +51,7 @@ ha_r = [4  5 15 20 9 12 20 25 35 20];
 dk_r = [0.1 0.07 0.05 0.05 0.025 0.02 0.02 0.02 0.02 0.05];
 
 for ii = 1:length(ha_t)
-    Lb(ii) = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, pressure, temp, ha_t(ii), ha_r(ii), dk_t(ii), dk_r(ii));
+    Lb(ii) = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, pressure, temp, ha_t(ii), ha_r(ii), dk_t(ii), dk_r(ii));
 end
 
 ref = [192.852982844169 ...

@@ -76,11 +76,11 @@ for ii = 1:2
         GYr(ii) = 20*log10(Br(ii) + 0.1* Br(ii).^3);
     end
     
-    if GYr(ii) < 2 + 20*log10(K(ii));
+    if GYr(ii) < 2 + 20*log10(K(ii))
         GYr(ii) = 2 + 20*log10(K(ii));
     end
     
-    if GYt(ii) < 2 + 20*log10(K(ii));
+    if GYt(ii) < 2 + 20*log10(K(ii))
         GYt(ii) = 2 + 20*log10(K(ii));
     end
     

@@ -24,14 +24,14 @@ function Ldsph = dl_se(d, hte, hre, ap, f, omega)
 %     -------------------------------------------------------------------------------
 %     v0    23DEC15     Ivica Stevanovic, OFCOM         Initial version
 %     v1    01FEB16     Ivica Stevanovic, OFCOM         Introduced dl_se_ft
-
-
+%     v2    24MAR22     Ivica Stevanovic, OFCOM         speed of light as as per ITU-R P.2001 
+%                                                       separate Ldft < 0 condition for h and v polarization.
 
 %% Body of function
 
 % Wavelength in meters
-
-lambda = 0.3/f;
+% speed of light as per ITU-R P.2001
+lambda = 0.2998/f;
 
 % Calculate the marginal LoS distance for a smooth path
 
@@ -76,12 +76,15 @@ else
         
         Ldft = dl_se_ft(d, hte, hre, aem, f, omega);
         
-        if Ldft < 0
-            Ldsph = [0 0]
-            return
-        else
-            Ldsph = (1- hse/hreq)*Ldft;     % Eq (28)
+        Ldsph = (1- hse/hreq)*Ldft;     % Eq (28)
+        
+        if Ldft(1) < 0
+            Ldsph(1) = 0;
         end
+        if Ldft(2) < 0
+            Ldsph(2) = 0;
+        end
+
     end
 end
 
