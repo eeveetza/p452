@@ -1,8 +1,8 @@
 function varargout = P452(varargin)
 %P452 M-file for P452.fig
-%      This is a GUI for the function tl_p456.m that computes the basic 
+%      This is a GUI for the function tl_p452.m that computes the basic 
 %      transmission loss not exceeded for p% of time as defined in 
-%      ITU-R P.452-16.
+%      ITU-R P.452-17.
 %
 %      P452, by itself, creates a new P452 or raises the existing
 %      singleton*.
@@ -29,6 +29,12 @@ function varargout = P452(varargin)
 % v1    04MAR16     Ivica Stevanovic, OFCOM    Initial Stable Version
 % v2    01JUN16     Ivica Stevanovic, OFCOM    Cleaned the code
 % v3    13FEB20     Ivica Stevanovic, OFCOM    Introduced 3D distance in Free-space calculation
+% v4    13JUL21     Ivica Stevanovic, OFCOM    Renamed subfolder "src" into "private" which is by default in the MATLAB search path
+%                                              (as suggested by K. Konstantinou, Ofcom UK)  
+%                                              Changed the starting point in transmission loss vs distance to make sure there are at least three points
+%                                              between clutter at the Tx and Rx sides 
+% v5    08OCT21     Ivica Stevanovic, OFCOM    Ensured that series is a row vector in find_intervals.m 
+% 
 
 % MATLAB Version 8.3.0.532 (R2014a) used in development of this code
 %
@@ -42,9 +48,9 @@ function varargout = P452(varargin)
 %
 % THE AUTHORS AND OFCOM (CH) DO NOT PROVIDE ANY SUPPORT FOR THIS SOFTWARE
 %
-% The functions that GUI calls are placed in the ./src folder
-% Test functions to verify/validate the current implementation are placed
-% in ./test folder
+% The functions that GUI calls are placed in the ./private folder
+% Test functions to verify/validate the current implementation are also placed
+% in ./private folder
 %
 % Edit the above text to modify the response to help P452
 
@@ -182,10 +188,10 @@ set(h,'FontSize',handles.p452.titleFontSize);
 
 %set(gcf, 'Renderer', 'opengl'); %mirrors (left/right, top/bottom) the figure in the first plot choice (not in the others?)
 %set(gcf, 'Renderer', 'painter'); % patches sometimes plotted over the title
-s = pwd;
-if ~exist('p676_ga.m','file')
-    addpath([s '/src/'])
-end
+% s = pwd;
+% if ~exist('p676_ga.m','file')
+%     addpath([s '/src/'])
+% end
 
 % Update handles structure
 guidata(hObject, handles);
@@ -276,6 +282,8 @@ if checkInput(hObject, eventdata, handles)
             handles.p452.dk_t, ...
             handles.p452.dk_r);
         
+        
+        
         %% Body of function
         
         % Path center latitude
@@ -284,10 +292,12 @@ if checkInput(hObject, eventdata, handles)
         
         % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
         zone_r = 12;
+        
         dtm = longest_cont_dist(handles.p452.path.d, handles.p452.path.zone, zone_r);
         
         % Compute  dlm     -   the longest continuous inland section of the great-circle path (km)
         zone_r = 2;
+        
         dlm = longest_cont_dist(handles.p452.path.d, handles.p452.path.zone, zone_r);
         
         % Compute b0
@@ -344,8 +354,7 @@ if checkInput(hObject, eventdata, handles)
         set(handles.profileParameters,'Data',d);
         handles.p452.profileParameters = d;
         
-        % modified with 3-D path for free-space computation, not yet included in
-        % P.452-16
+        % modified with 3-D path for free-space computation
 
         d3D = sqrt(dtot*dtot + ((hts-hrs)/1000.0).^2);
         
@@ -536,36 +545,38 @@ elseif userChoiceInt ==3 %as a function of power density
     end
     
     count = 0;
-    for ii = 5:length(handles.p452.path.d)
+    for ii = 6:length(handles.p452.path.d)
         d = handles.p452.path.d(1:ii);
         h = handles.p452.path.h(1:ii);
         zone = handles.p452.path.zone(1:ii);
         
-        Lb = tl_p452(   handles.p452.f, ...
-            handles.p452.p, ...
-            d, ...
-            h, ...
-            zone, ...
-            handles.p452.htg, ...
-            handles.p452.hrg, ...
-            handles.p452.phi_t,...
-            handles.p452.phi_r, ...
-            handles.p452.Gt, ...
-            handles.p452.Gr, ...
-            handles.p452.polarization, ...
-            handles.p452.dct, ...
-            handles.p452.dcr, ...
-            handles.p452.DN, ...
-            handles.p452.N0, ...
-            handles.p452.press, ...
-            handles.p452.temp, ...
-            handles.p452.ha_t, ...
-            handles.p452.ha_r, ...
-            handles.p452.dk_t, ...
-            handles.p452.dk_r);
-        count = count + 1;
-        xx(count) = d(end)-d(1);
-        yy(count) = Lb;
+        %if (handles.p452.dk_t + handles.p452.dk_r < 10*(d(end)-d(1)))
+            Lb = tl_p452(   handles.p452.f, ...
+                handles.p452.p, ...
+                d, ...
+                h, ...
+                zone, ...
+                handles.p452.htg, ...
+                handles.p452.hrg, ...
+                handles.p452.phi_t,...
+                handles.p452.phi_r, ...
+                handles.p452.Gt, ...
+                handles.p452.Gr, ...
+                handles.p452.polarization, ...
+                handles.p452.dct, ...
+                handles.p452.dcr, ...
+                handles.p452.DN, ...
+                handles.p452.N0, ...
+                handles.p452.press, ...
+                handles.p452.temp, ...
+                handles.p452.ha_t, ...
+                handles.p452.ha_r, ...
+                handles.p452.dk_t, ...
+                handles.p452.dk_r);
+            count = count + 1;
+            xx(count) = d(end)-d(1);
+            yy(count) = Lb;
+        %end
     end
     
     axis(ax);
@@ -1058,7 +1069,7 @@ if (filename==0)
     return
 end
 
-dummy = load([pathname '\' filename])
+dummy = load([pathname '/' filename])
 handles.p452 = dummy.out;
 handles.p452
 
@@ -2114,7 +2125,7 @@ function WorstMonthDN_Callback(hObject, eventdata, handles)
 % hObject    handle to WorstMonthDN (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-C = imread('Fig12.png');
+C = imread('./private/Fig12.png');
 h = figure;
 set(h, 'Name', 'Maximum monthly values of DN')
 image(C);
@@ -2126,7 +2137,7 @@ function SurfaceRefractivityN0_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-C = imread('Fig13.png');
+C = imread('./private/Fig13.png');
 h = figure;
 set(h, 'Name', 'Sea-level surface refractivity N0')
 image(C);
@@ -2138,7 +2149,7 @@ function AnnualDN_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-C = imread('Fig11.png');
+C = imread('./private/Fig11.png');
 h = figure;
 set(h, 'Name', 'Average annual values of DN')
 image(C);
@@ -2152,14 +2163,14 @@ function About_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 msg =  {'- This program computes the basic transmission loss according to'; ...
-        '  ITU-R P.452-16.'; ' ';...
+        '  ITU-R P.452-17.'; ' ';...
 '- The main implementation of the recommendation is MATLAB function'; ...
 '  tl_p452.m placed in this folder that can be used independently'; ...
 '  of this Graphical User Interface but needs the functions '; ...
-'  defined in the folder ./src.'; ' ';...
+'  defined in the folder ./private.'; ' ';...
 '- Hydrometeor-scatter prediction is not implemented in this version.'; ' ';...
 '- Test functions to verify/validate the current implementation are placed'; ...
-'  in ./test folder.'; ' '; ...
+'  in ./private folder.'; ' '; ...
 '- v2.25.11.16,  Ivica Stevanovic, OFCOM (CH)';};
 h = msgbox(msg,'About');
 
@@ -2169,10 +2180,10 @@ function ValidationTest_Callback(hObject, eventdata, handles)
 % hObject    handle to ValidationTest (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-s = pwd;
-if ~exist('test_deltaBullington.m','file')
-    addpath([s '/test/'])
-end
+% s = pwd;
+% if ~exist('test_deltaBullington.m','file')
+%     addpath([s '/test/'])
+% end
 success = 0;
 fail = 0;
 [s,f] = test_deltaBullington();

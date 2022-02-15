@@ -28,6 +28,7 @@ function [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta_
 % -------------------------------------------------------------------------------
 % v0    15JAN16     Ivica Stevanovic, OFCOM         First implementation in matlab
 % v1    15JUN16     Ivica Stevanovic, OFCOM         Modifications related to LoS path
+% v2    25OCT21     Ivica Stevanovic, OFCOM         Editorial modifications in Eq (154) according to P.452-17 
 
 n = length(d);
 
@@ -97,11 +98,14 @@ theta = 1000 * atan( (h(ii) - hts)./(1000 * d(ii) ) - d(ii)./(2*ae) );  % Eq (15
 
 %theta(theta < 0) = 0;  % condition below equation (152)
 
-theta_t = max(theta);                           % Eq (154)
-
-
 theta_td = 1000 * atan( (hrs - hts)./(1000 * dtot ) - dtot./(2*ae) );  % Eq (153)
 theta_rd = 1000 * atan( (hts - hrs)./(1000 * dtot ) - dtot./(2*ae) );  % not defined in the recommendation
+
+
+%theta_t = max(theta);                           % Eq (154)
+theta_max = max(theta);
+theta_t = max(theta_max, theta_td);                           % Eq (154)
+
 
 if theta_t > theta_td   % Eq (150): test for the trans-horizon path
     pathtype = 2; %transhorizon
@@ -110,7 +114,8 @@ else
 end
 
 
-kindex = find(theta == theta_t);
+%kindex = find(theta == theta_t);
+kindex = find(theta == theta_max);
 
 lt = kindex(1)+1;
 
@@ -122,9 +127,11 @@ theta = 1000 * atan( (h(ii) - hrs)./(1000 * (dtot - d(ii)) ) - (dtot - d(ii))./(
 
 %theta(theta < 0) = 0;
 
-theta_r = max(theta);
+%theta_r = max(theta);
+theta_max = max(theta);
+theta_r = max(theta_max, theta_rd);
 
-kindex = find(theta == theta_r);
+kindex = find(theta == theta_max);
 lr = kindex(end)+1;
 
 dlr = dtot - d(lr);                            % Eq (158)

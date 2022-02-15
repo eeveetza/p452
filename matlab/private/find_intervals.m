@@ -24,9 +24,15 @@ function [k1, k2] = find_intervals(series)
 %     -------------------------------------------------------------------------------
 %     v0    22JAN16     Ivica Stevanovic, OFCOM         First implementation in matlab
 %     v1    22JUN16     Roger LeClair, leclairtelecom   Modified to optimize for speed
+%     v3    08OCT21     Ivica Stevanovic, OFCOM         Ensured that series is a row vector
 
 k1 = [];
 k2 = [];
+% make sure series is  is a row vector
+
+    if (size(series,1) > 1)
+        series = series.';
+    end
 
 if max(series) == 1
     k1 = find(diff([0, series]) == 1);

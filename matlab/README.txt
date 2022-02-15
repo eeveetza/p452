@@ -1,45 +1,42 @@
-P452 Version 16.3 (05.06.20)
+P452 Version 17.0 (26.10.21)
 
 GENERAL NOTES
 ----------------
-- This MATLAB/Octave program computes the basic transmission loss according to Recommendation ITU-R P.452-16.
+- This MATLAB/Octave program computes the basic transmission loss according to Recommendation ITU-R P.452-17.
 
 - The folder contains the following:
 
 
-  1) tl_p452.m is the main function implementing Recommendation ITU-R P.452-16. This function calls
-     other matlab routines defined in subfolder ./src/
+  1) tl_p452.m is the main function implementing Recommendation ITU-R P.452-17. This function calls
+     other matlab routines defined in subfolder ./private/
      To know how to use the function, read the header of the function or type
      >> help tl_p452 
 
-  2) Subfolder ./src/ with all the MATLAB routines necessary for the implementation of the
-     propagation model, including the MATLAB implementation of Recommendation ITU-R P.676-10
+  2) Subfolder ./private/ with all the MATLAB routines necessary for the implementation of the
+     propagation model, including the MATLAB implementation of Recommendation ITU-R P.676-11
      (computing the specific attenuation due to dry air and water vapor by means of a summation
      of individual resonance lines from oxigen and water vapor).
 
-  3) Subfolder ./validation_examples with a non-exhaustive set of validation examples,
-     in a form of Excel worksheets, for different terrain profiles, clutter heights, frequencies, time-probabilities, etc. 
-     They include intermediate and final results of the calculations performed within P.452-16 
-     with the aim of facilitating testing and validation, as well as comparison between different software implementations.
-     They are obtained using Excel implementation of Recommendation ITU-R P.452-16 as defined in ITUR_452_16.xlsm
-
-  4) validate_p452.m is a MATLAB script that validates the implementation of this recommendation as defined in tl_p452.m
-     against the reference results obtained using Excel implementation of the same recommendation and reports success if
-     the maximum deviation in final and intermediate results is less than tol = 1e-4 dB.
-
-  5) Graphical User Interface defined in files P452.m and P452.fig
+  3) Graphical User Interface defined in files P452.m and P452.fig (only MATLAB)
      The interface can be opened by invoking the following command in the MATLAB command window 
      >> P452
 
-  6) test_example.mat is an example of simulation data file that can be opened by the GUI
+  4) test_example.mat is an example of simulation data file that can be opened by the GUI
   
-  7) Subfolder ./test/ with test functions used to verify the current implementation of the model.
-     This subfolder also contains several files with path profile data used in testing.
+  5) Subfolder ./private/ also contains test functions used to verify the current implementation of the model.
+     including several files with path profile data used in testing.
 
-All the scripts (except for the Graphical User Interface) should work in Octave as well.
+All the scripts (except for the Graphical User Interface) work in Octave (versions 6.0 and above).
 
 UPDATES AND FIXES
 -----------------
+Version 17.0 (26.10.21)
+    - Renamed subfolder "src" into "private" which is automatically in the MATLAB search path
+    - Modified the starting point in P452.m when computing transmission loss vs distance to make sure there are at least three points 
+      between clutter at the Tx and Rx sides
+    - Ensured that the variable series is a row vector in find_intervals.m
+    - Updated validation examples to align with the changes in the factor 92.4 dB in free-space basic transmission loss
+
 Version 16.3 (05.06.20)
     - Introduced 3D distance for free-space basic transmission loss (to be included in the next revision of Recommendation ITU-R P.452-16)
     - Introduced a new computationally efficient version of find_intervals.m to align with P.1812
@@ -64,7 +61,7 @@ Version 1.16.06.16
 License and copyright notice
 
 Swiss Federal Office of Communications OFCOM (hereinafter the "Software Copyright Holder") makes the accompanying software 
-(hereinafter the “Software”) available free from copyright restriction. 
+(hereinafter the "Software") available free from copyright restriction. 
 
 The Software Copyright Holder represents and warrants that to the best of its knowledge, 
 it has the necessary copyright rights to waive all of the copyright rights as permissible under national law in the Software 
@@ -74,7 +71,7 @@ No patent licence is granted, nor is a patent licensing commitment made, by impl
 
 Disclaimer: Other than as expressly provided herein, 
 
-(1) the Software is provided “AS IS” WITH NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, 
+(1) the Software is provided "AS IS" WITH NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, 
 THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGMENT OF INTELLECTUAL PROPERTY RIGHTS and 
 
 (2) neither the Software Copyright Holder (or its affiliates) nor the ITU shall be held liable in any event for any damages whatsoever 

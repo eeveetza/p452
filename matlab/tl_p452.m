@@ -3,8 +3,8 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r )
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
-%   as defined in ITU-R P.452-16 (Section 4.6). Other functions called from
-%   this function are in ./src/ subfolder.
+%   as defined in ITU-R P.452-17 (Section 4.6). Other functions called from
+%   this function are in ./private/ subfolder.
 %
 %     Input parameters:
 %     f       -   Frequency (GHz)
@@ -40,7 +40,7 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     dk_r    -   Clutter nominal distance (km) at the Rx side
 %
 %     Output parameters:
-%     Lb     -   basic  transmission loss according to P.452-16
+%     Lb     -   basic  transmission loss according to P.452-17
 %
 %     Example:
 %     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
@@ -60,7 +60,9 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     v5    13FEB17     Ivica Stevanovic, OFCOM         included lower limit for alpha and upper limit for mu2 in tl_anomalous
 %     v6    05JUN20     Ivica Stevanovic, OFCOM         Introduced 3D distance in Free-space calculation
 %                                                       Introduced a new computationally efficient version of find_intervals.m to align with P.1812
-
+%     v7    13JUL21     Ivica Stevanovic, OFCOM         Renamed subfolder "src" into "private" which is automatically in the MATLAB search path
+%                                                       (as suggested by K. Konstantinou, Ofcom UK)   
+%     v8    08OCT21     Ivica Stevanovic, OFCOM         Ensured that the variable "series" is a row vector in find_intervals.m
 
 % MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
@@ -77,10 +79,10 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 % This function calls other functions that are placed in the ./src folder
 % Test functions to verify/validate the current implementation are placed  in ./test folder
 
-s = pwd;
-if ~exist('p676d11_ga.m','file')
-    addpath([s '/src/'])
-end
+% s = pwd;
+% if ~exist('p676d11_ga.m','file')
+%     addpath([s '/src/'])
+% end
 
 % Read the input arguments 
 
