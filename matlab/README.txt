@@ -1,41 +1,38 @@
-P452 Version 17.0 (26.10.21)
+P452 Version 17.0_PDR (27.10.21)
 
 GENERAL NOTES
 ----------------
-- This MATLAB/Octave program computes the basic transmission loss according to Recommendation ITU-R P.452-17.
+- This MATLAB/Octave program computes the basic transmission loss according to PDR of Recommendation ITU-R P.452-16 that clutter along the path.
 
 - The folder contains the following:
 
 
-  1) tl_p452.m is the main function implementing Recommendation ITU-R P.452-17. This function calls
+  1) tl_p452.m is the main function implementing PDR of Recommendation ITU-R P.452-16. This function calls
      other matlab routines defined in subfolder ./private/
      To know how to use the function, read the header of the function or type
-     >> help tl_p452 
+     >> help tl_p452_pdr 
 
   2) Subfolder ./private/ with all the MATLAB routines necessary for the implementation of the
      propagation model, including the MATLAB implementation of Recommendation ITU-R P.676-11
      (computing the specific attenuation due to dry air and water vapor by means of a summation
      of individual resonance lines from oxigen and water vapor).
 
-  3) Graphical User Interface defined in files P452.m and P452.fig (only MATLAB)
-     The interface can be opened by invoking the following command in the MATLAB command window 
-     >> P452
-
-  4) test_example.mat is an example of simulation data file that can be opened by the GUI
-  
-  5) Subfolder ./private/ also contains test functions used to verify the current implementation of the model.
-     including several files with path profile data used in testing.
 
 All the scripts (except for the Graphical User Interface) work in Octave (versions 6.0 and above).
 
 UPDATES AND FIXES
 -----------------
-Version 17.0 (26.10.21)
+Version 17.0_PDR (27.10.21)
+    - Introduced clutter along the path as described in PDR P.452-16
+    - Aligned pl_los.m with the ITU-R P.452-17 and free-space propagation model from ITU-R P.525-4
+    - Updated validation examples to align with the changes in the factor 92.4 dB in free-space basic transmission loss
+      Currently all the validation examples are without clutter profile - this needs tbd
+
+Version 17.0 (08.10.21)
     - Renamed subfolder "src" into "private" which is automatically in the MATLAB search path
     - Modified the starting point in P452.m when computing transmission loss vs distance to make sure there are at least three points 
       between clutter at the Tx and Rx sides
     - Ensured that the variable series is a row vector in find_intervals.m
-    - Updated validation examples to align with the changes in the factor 92.4 dB in free-space basic transmission loss
 
 Version 16.3 (05.06.20)
     - Introduced 3D distance for free-space basic transmission loss (to be included in the next revision of Recommendation ITU-R P.452-16)

@@ -1,9 +1,10 @@
-function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, varargin)
-%tl_p452 basic transmission loss according to P.452-16
-%   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r )
+function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
+%tl_p452_pdr basic transmission loss according to P.452-16
+%   Lb = tl_p452_pdr(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
-%   as defined in ITU-R P.452-17 (Section 4.6). Other functions called from
+%   as defined in 3M/253 Annex 8 (WP 3M Chairman’s Report 2021) - removing terminal clutter and applying clutter along the path. 
+%   Other functions called from
 %   this function are in ./private/ subfolder.
 %
 %     Input parameters:
@@ -13,7 +14,8 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     d       -   vector of distances di of the i-th profile point (km)
 %     h       -   vector of heights hi of the i-th profile point (meters
 %                 above mean sea level. Both vectors contain n+1 profile points
-%     zone    -   Zone type: Coastal land (1), Inland (2) or Sea (3)
+%     zone    -   vector of zone types: Coastal land (1), Inland (2) or Sea (3)
+%     g       -   vector of clutter heights gi along the path 
 %     htg     -   Tx Antenna center heigth above ground level (m)
 %     hrg     -   Rx Antenna center heigth above ground level (m)
 %     phi_t   -   Latitude of Tx station (degrees)
@@ -34,17 +36,14 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %                 maps (N-units)
 %     press   -   Dry air pressure (hPa)
 %     temp    -   Air temperature (degrees C)
-%     ha_t    -   Clutter nominal height (m) at the Tx side
-%     ha_r    -   Clutter nominal height (m) at the Rx side
-%     dk_t    -   Clutter nominal distance (km) at the Tx side
-%     dk_r    -   Clutter nominal distance (km) at the Rx side
+
 %
 %     Output parameters:
 %     Lb     -   basic  transmission loss according to P.452-17
 %
 %     Example:
-%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
-%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r)
+%     Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
+%    
 
 %     Rev   Date        Author                          Description
 %     -------------------------------------------------------------------------------
@@ -63,6 +62,9 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     v7    13JUL21     Ivica Stevanovic, OFCOM         Renamed subfolder "src" into "private" which is automatically in the MATLAB search path
 %                                                       (as suggested by K. Konstantinou, Ofcom UK)   
 %     v8    08OCT21     Ivica Stevanovic, OFCOM         Ensured that the variable "series" is a row vector in find_intervals.m
+%                                                       Removed height-gain terminal clutter and introduced clutter along the path 
+%                                                       inline with 3M/253 Annex 8 (WP 3M Chairman’s Report 2021)
+
 
 % MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
@@ -86,37 +88,37 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 
 % Read the input arguments 
 
-if nargin > 22    warning(strcat('tl_p452: Too many input arguments; The function requires at most 22',...
+if nargin > 19    warning(strcat('tl_p452_pdr: Too many input arguments; The function requires at most 18',...
         'input arguments. Additional values ignored. Input values may be wrongly assigned.'));
 end
 
-if nargin <18 
-    error('tl_p452: function requires at least 18 input parameters.');
+if nargin < 19 
+    error('tl_p452_pdr: function requires at least 18 input parameters.');
 end
 
-ha_t = [];
-ha_r = [];
-dk_t = [];
-dk_r = [];
-
-narg = 19;
-
-
-if nargin >=narg
-    ha_t=varargin{1};
-    narg = narg + 1;
-    if nargin >=narg
-        ha_r=varargin{2};
-        narg = narg + 1;
-        if nargin >=narg
-            dk_t=varargin{3};
-            narg = narg + 1;
-            if nargin >=narg
-                dk_r=varargin{4};
-            end
-        end
-    end
-end
+% ha_t = [];
+% ha_r = [];
+% dk_t = [];
+% dk_r = [];
+% 
+% narg = 19;
+% 
+% 
+% if nargin >=narg
+%     ha_t=varargin{1};
+%     narg = narg + 1;
+%     if nargin >=narg
+%         ha_r=varargin{2};
+%         narg = narg + 1;
+%         if nargin >=narg
+%             dk_t=varargin{3};
+%             narg = narg + 1;
+%             if nargin >=narg
+%                 dk_r=varargin{4};
+%             end
+%         end
+%     end
+% end
 
 % Compute the path profile parameters
 % Path center latitude
@@ -128,11 +130,12 @@ phi_path = (phi_t + phi_r)/2;
 % Phite = 0;
 % Phire = 0;
 % 
+
 % Re = 6371;
 % dpnt = 0.5*( d(end)-d(1) );
-
-%[Phipnte, Phipntn, Bt2r, dgc] = great_circle_path(Phire, Phite, Phirn, Phitn, Re, dpnt);
-%phi_path = Phipntn;
+% 
+% [Phipnte, Phipntn, Bt2r, dgc] = great_circle_path(Phire, Phite, Phirn, Phitn, Re, dpnt);
+% phi_path = Phipntn;
 
 % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
 zone_r = 12;
@@ -151,24 +154,24 @@ b0 = beta0(phi_path, dtm, dlm);
 
 omega = path_fraction(d, zone, 3);
 
-% Modify the path according to Section 4.5.4, Step 1 and compute clutter losses
-% only if not isempty ha_t and ha_r
-
-[dc, hc, zonec, htgc, hrgc, Aht, Ahr] = closs_corr(f, d, h, zone, htg, hrg, ha_t, ha_r, dk_t, dk_r);
-
-d = dc;
-h = hc;
-zone = zonec;
-htg = htgc;
-hrg = hrgc;
+% % Modify the path according to Section 4.5.4, Step 1 and compute clutter losses
+% % only if not isempty ha_t and ha_r
+% 
+% [dc, hc, zonec, htgc, hrgc, Aht, Ahr] = closs_corr(f, d, h, zone, htg, hrg, ha_t, ha_r, dk_t, dk_r);
+% 
+% d = dc;
+% h = hc;
+% zone = zonec;
+% htg = htgc;
+% hrg = hrgc;
 
 [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(d, h, htg, hrg, ae, f);
 
 dtot = d(end)-d(1);
 
 %Tx and Rx antenna heights above mean sea level amsl (m)
-hts = h(1) + htgc;
-hrs = h(end) + hrgc;
+hts = h(1) + htg;
+hrs = h(end) + hrg;
 
 % Effective Earth curvature Ce (km^-1)
 
@@ -223,7 +226,8 @@ d3D = sqrt(dtot*dtot + ((hts-hrs)/1000.0).^2);
 [Lbfsg, Lb0p, Lb0b] = pl_los(d3D, f, p, b0, omega, temp, press, dlt, dlr);
 
 
-[ Ldp, Ld50 ] = dl_p( d, h, hts, hrs, hstd, hsrd, f, omega, p, b0, DN );
+%[ Ldp, Ld50 ] = dl_p( d, h, hts, hrs, hstd, hsrd, f, omega, p, b0, DN );
+[ Ldp, Ld50 ] = dl_p( d, g, hts, hrs, hstd, hsrd, f, omega, p, b0, DN );
 
 % The median basic transmission loss associated with diffraction Eq (43)
 
@@ -277,7 +281,8 @@ Lbs = tl_tropo(dtot, theta, f, p, temp, press, N0, Gt, Gr );
 
 % Calculate the final transmission loss not exceeded for p% time
 
-Lb_pol = -5*log10(10.^(-0.2*Lbs) + 10.^(-0.2*Lbam)) + Aht + Ahr;  % eq (64)
+%Lb_pol = -5*log10(10.^(-0.2*Lbs) + 10.^(-0.2*Lbam)) + Aht + Ahr;  % eq (64)
+Lb_pol = -5*log10(10.^(-0.2*Lbs) + 10.^(-0.2*Lbam)) ;  % eq (64)
 
 Lb = Lb_pol(pol);
 
