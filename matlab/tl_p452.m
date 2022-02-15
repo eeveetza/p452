@@ -58,11 +58,11 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %                                                       Added a check for the clutter loss nominal distances in cl_loss 
 %     v4    10JAN17     Ivica Stevanovic, OFCOM         Corrected the Input parameters definition pol = 1(horizontal), pol = 2 (vertical) t
 %     v5    13FEB17     Ivica Stevanovic, OFCOM         included lower limit for alpha and upper limit for mu2 in tl_anomalous
+%     v6    05JUN20     Ivica Stevanovic, OFCOM         Introduced 3D distance in Free-space calculation
+%                                                       Introduced a new computationally efficient version of find_intervals.m to align with P.1812
 
-%   
 
-
-% MATLAB Version 8.3.0.532 (R2014a) used in development of this code
+% MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
 % THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 % EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -119,6 +119,18 @@ end
 % Compute the path profile parameters
 % Path center latitude
 phi_path = (phi_t + phi_r)/2;
+
+% great circle calculation according to P.2001 Annex H maybe more appropriate for longer paths
+% Phitn = phi_t;
+% Phirn = phi_r;
+% Phite = 0;
+% Phire = 0;
+% 
+% Re = 6371;
+% dpnt = 0.5*( d(end)-d(1) );
+
+%[Phipnte, Phipntn, Bt2r, dgc] = great_circle_path(Phire, Phite, Phirn, Phitn, Re, dpnt);
+%phi_path = Phipntn;
 
 % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
 zone_r = 12;
@@ -200,7 +212,13 @@ kappa = 0.5;
 
 Fk = 1.0 - 0.5*( 1.0 + tanh(3.0 * kappa * (dtot-dsw)/dsw) ); % eq (59)
 
-[Lbfsg, Lb0p, Lb0b] = pl_los(dtot, f, p, b0, omega, temp, press, dlt, dlr);
+% modified with 3-D path for free-space computation, not yet included in
+% P.452-16
+
+d3D = sqrt(dtot*dtot + ((hts-hrs)/1000.0).^2);
+
+%[Lbfsg, Lb0p, Lb0b] = pl_los(dtot, f, p, b0, omega, temp, press, dlt, dlr);
+[Lbfsg, Lb0p, Lb0b] = pl_los(d3D, f, p, b0, omega, temp, press, dlt, dlr);
 
 
 [ Ldp, Ld50 ] = dl_p( d, h, hts, hrs, hstd, hsrd, f, omega, p, b0, DN );

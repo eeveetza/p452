@@ -28,6 +28,7 @@ function varargout = P452(varargin)
 %-------------------------------------------------------------------------------
 % v1    04MAR16     Ivica Stevanovic, OFCOM    Initial Stable Version
 % v2    01JUN16     Ivica Stevanovic, OFCOM    Cleaned the code
+% v3    13FEB20     Ivica Stevanovic, OFCOM    Introduced 3D distance in Free-space calculation
 
 % MATLAB Version 8.3.0.532 (R2014a) used in development of this code
 %
@@ -278,6 +279,7 @@ if checkInput(hObject, eventdata, handles)
         %% Body of function
         
         % Path center latitude
+        % great circle calculation according to P.2001 Annex H maybe more appropriate for longer paths
         phi_path = (handles.p452.phi_t + handles.p452.phi_r)/2;
         
         % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
@@ -342,9 +344,13 @@ if checkInput(hObject, eventdata, handles)
         set(handles.profileParameters,'Data',d);
         handles.p452.profileParameters = d;
         
+        % modified with 3-D path for free-space computation, not yet included in
+        % P.452-16
+
+        d3D = sqrt(dtot*dtot + ((hts-hrs)/1000.0).^2);
         
-        
-        [Lbfsg, Lb0p, Lb0b] = pl_los(dtot, ...
+        %[Lbfsg, Lb0p, Lb0b] = pl_los(dtot, ...
+        [Lbfsg, Lb0p, Lb0b] = pl_los(d3D, ...
             handles.p452.f, ...
             handles.p452.p, ...
             b0, ...

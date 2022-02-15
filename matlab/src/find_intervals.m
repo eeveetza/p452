@@ -23,42 +23,55 @@ function [k1, k2] = find_intervals(series)
 %     Rev   Date        Author                          Description
 %     -------------------------------------------------------------------------------
 %     v0    22JAN16     Ivica Stevanovic, OFCOM         First implementation in matlab
+%     v1    22JUN16     Roger LeClair, leclairtelecom   Modified to optimize for speed
 
 k1 = [];
 k2 = [];
-count = 1;
 
-if (series(1) ==1 && series(2) == 1)
-    k1(count) = 1;
-    count = count + 1;
-end
-
-for i = 2:length(series)-1
+if max(series) == 1
+    k1 = find(diff([0, series]) == 1);
+    k2 = find(diff([series, 0]) == -1);
     
-    
-    if (series(i-1) == 0 ) && (series(i) == 1)  
-        k1(count) = i;
-        count = count + 1;
-        
-    end
-end
-
-count = 1;
-
-for i = 2:length(series)-1
-    
-    if (series(i) == 1) && (series(i+1) == 0 )
-        k2(count) = i;
-        count = count + 1;
-        
-    end
-end
-
-if (series(end) ==1 && series(end-1) == 1)
-    k2(count) = length(series);
-    count = count + 1;
-end
-
+end % if
 
 return
 end
+
+% >>> Start code change.
+
+%count = 1;
+
+%if (series(1) ==1 && series(2) == 1)
+%    k1(count) = 1;
+%    count = count + 1;
+%end
+
+%for i = 2:length(series)-1
+    
+    
+%    if (series(i-1) == 0 ) && (series(i) == 1)  
+%        k1(count) = i;
+%        count = count + 1;
+        
+%    end
+%end
+
+%count = 1;
+
+%for i = 2:length(series)-1
+   
+%    if (series(i) == 1) && (series(i+1) == 0 )
+%        k2(count) = i;
+%        count = count + 1;
+        
+%    end
+%end
+
+%if (series(end) ==1 && series(end-1) == 1)
+%    k2(count) = length(series);
+%    count = count + 1;
+%end
+
+% >>> End code change.
+
+
