@@ -27,7 +27,6 @@ if zone_r  == 12
 else
     [start,stop] = find_intervals((zone == zone_r));
 end
-
 n = length(start);
 
 for i = 1:n

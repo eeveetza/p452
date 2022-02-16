@@ -1,10 +1,10 @@
-function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, varargin)
-%tl_p452 basic transmission loss according to P.452-16
-%   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r )
+function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, varargin)
+%tl_p452 basic transmission loss according to ITU-R P.452-17
+%   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r )
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
-%   as defined in ITU-R P.452-16 (Section 4.6). Other functions called from
-%   this function are in ./src/ subfolder.
+%   as defined in ITU-R P.452-17 (Section 4.6). Other functions called from
+%   this function are in ./private/ subfolder.
 %
 %     Input parameters:
 %     f       -   Frequency (GHz)
@@ -16,8 +16,7 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     zone    -   Zone type: Coastal land (1), Inland (2) or Sea (3)
 %     htg     -   Tx Antenna center heigth above ground level (m)
 %     hrg     -   Rx Antenna center heigth above ground level (m)
-%     phi_t   -   Latitude of Tx station (degrees)
-%     phi_r   -   Latitude of Rx station (degrees)
+%     phi_path-   Latitude of Tx-Rx path center (degrees)
 %     Gt, Gr  -   Antenna gain in the direction of the horizon along the
 %                 great-circle interference path (dBi)
 %     pol     -   polarization of the signal (1) horizontal, (2) vertical
@@ -40,11 +39,11 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     dk_r    -   Clutter nominal distance (km) at the Rx side
 %
 %     Output parameters:
-%     Lb     -   basic  transmission loss according to P.452-16
+%     Lb     -   basic  transmission loss according to ITU-R P.452-17
 %
 %     Example:
-%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
-%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r)
+%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
+%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r)
 
 %     Rev   Date        Author                          Description
 %     -------------------------------------------------------------------------------
@@ -59,37 +58,36 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct
 %     v4    10JAN17     Ivica Stevanovic, OFCOM         Corrected the Input parameters definition pol = 1(horizontal), pol = 2 (vertical) t
 %     v5    13FEB17     Ivica Stevanovic, OFCOM         included lower limit for alpha and upper limit for mu2 in tl_anomalous
 %     v6    05JUN20     Ivica Stevanovic, OFCOM         Introduced 3D distance in Free-space calculation
-%                                                       Introduced a new computationally efficient version of find_intervals.m to align with P.1812
-
-
+%                                                       Introduced a new computationally efficient version of find_intervals.m to align with ITU-R P.1812-5
+%     v7    13JUL21     Ivica Stevanovic, OFCOM         Renamed subfolder "src" into "private" which is automatically in the MATLAB search path
+%                                                       (as suggested by K. Konstantinou, Ofcom UK)   
+%     v8    08OCT21     Ivica Stevanovic, OFCOM         Ensured that the variable "series" is a row vector in find_intervals.m
+%     v9    24MAR22     Ivica Stevanovic, OFCOM         Introduced path center latitude as input argument (instead of Tx/Rx latitudes) 
 % MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
-% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-% IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-% OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-% ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-% OTHER DEALINGS IN THE SOFTWARE.
+% The Software is provided "AS IS" WITH NO WARRANTIES, EXPRESS OR IMPLIED, 
+% INCLUDING BUT NOT LIMITED TO, THE WARRANTIES OF MERCHANTABILITY, FITNESS 
+% FOR A PARTICULAR PURPOSE AND NON-INFRINGMENT OF INTELLECTUAL PROPERTY RIGHTS 
+% 
+% Neither the Software Copyright Holder (or its affiliates) nor the ITU 
+% shall be held liable in any event for any damages whatsoever
+% (including, without limitation, damages for loss of profits, business 
+% interruption, loss of information, or any other pecuniary loss)
+% arising out of or related to the use of or inability to use the Software.
 %
 % THE AUTHOR(S) AND OFCOM (CH) DO NOT PROVIDE ANY SUPPORT FOR THIS SOFTWARE
 %
-% This function calls other functions that are placed in the ./src folder
-% Test functions to verify/validate the current implementation are placed  in ./test folder
+% This function calls other functions that are placed in the ./private folder
 
-s = pwd;
-if ~exist('p676d11_ga.m','file')
-    addpath([s '/src/'])
-end
 
 % Read the input arguments 
 
-if nargin > 22    warning(strcat('tl_p452: Too many input arguments; The function requires at most 22',...
+if nargin > 21    warning(strcat('tl_p452: Too many input arguments; The function requires at most 21',...
         'input arguments. Additional values ignored. Input values may be wrongly assigned.'));
 end
 
-if nargin <18 
-    error('tl_p452: function requires at least 18 input parameters.');
+if nargin <17 
+    error('tl_p452: function requires at least 17 input parameters.');
 end
 
 ha_t = [];
@@ -97,7 +95,7 @@ ha_r = [];
 dk_t = [];
 dk_r = [];
 
-narg = 19;
+narg = 18;
 
 
 if nargin >=narg
@@ -116,21 +114,21 @@ if nargin >=narg
     end
 end
 
+% verify input argument values and limits
+check_limit(f, 0.1, 50.0, 'f [GHz]');
+check_limit(p, 0.001, 50, 'p [%]');
+check_limit(phi_path, -90, 90, 'phi_path [deg]');
+check_limit(dct, 0, inf, 'dct [km]');
+check_limit(dcr, 0, inf, 'dcr [km]');
+check_value(pol, [1, 2], 'Polarization (pol) ');
+check_value(zone, [1, 2, 3], 'Radio-climatic zone (zone) ');
+
+if (d(1) > 0)
+   error('d(0)  must be equal to zero.'); 
+end
+
+
 % Compute the path profile parameters
-% Path center latitude
-phi_path = (phi_t + phi_r)/2;
-
-% great circle calculation according to P.2001 Annex H maybe more appropriate for longer paths
-% Phitn = phi_t;
-% Phirn = phi_r;
-% Phite = 0;
-% Phire = 0;
-% 
-% Re = 6371;
-% dpnt = 0.5*( d(end)-d(1) );
-
-%[Phipnte, Phipntn, Bt2r, dgc] = great_circle_path(Phire, Phite, Phirn, Phitn, Re, dpnt);
-%phi_path = Phipntn;
 
 % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
 zone_r = 12;
@@ -172,10 +170,6 @@ hrs = h(end) + hrgc;
 
 Ce = 1/ae;
 
-% Wavelength in meters
-
-lambda = 0.3/f;
-
 
 % Find the intermediate profile point with the highest slope of the line
 % from the transmitter to the point
@@ -212,9 +206,7 @@ kappa = 0.5;
 
 Fk = 1.0 - 0.5*( 1.0 + tanh(3.0 * kappa * (dtot-dsw)/dsw) ); % eq (59)
 
-% modified with 3-D path for free-space computation, not yet included in
-% P.452-16
-
+% modified with 3-D path for free-space computation, 
 d3D = sqrt(dtot*dtot + ((hts-hrs)/1000.0).^2);
 
 %[Lbfsg, Lb0p, Lb0b] = pl_los(dtot, f, p, b0, omega, temp, press, dlt, dlr);

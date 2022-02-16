@@ -156,7 +156,7 @@ Aht = 0;
 Ahr = 0;
 pol = 1; %polarization
 for ii = 1:length(ff)
-Lb(ii,:) = tl_p452(ff(ii), p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, pressure, temp);
+Lb(ii,:) = tl_p452(ff(ii), p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, pressure, temp);
 end
 
 
@@ -228,7 +228,7 @@ Aht = 0;
 Ahr = 0;
 pol = 1; %polarization
 for ii = 1:length(pp)
-Lb(ii,:) = tl_p452(f, pp(ii), d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, pressure, temp );
+Lb(ii,:) = tl_p452(f, pp(ii), d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, pressure, temp );
 end
 
 

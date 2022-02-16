@@ -93,7 +93,7 @@ end
 
 % Modify the path
 
-if (index2-index1 < 3) % at least two points between the clutter at Tx and Rx sides
+if (index2-index1 < 4) % at least three points between the clutter at Tx and Rx sides
     error('tl_p452: closs_corr: the sum of clutter nominal distances is larger than the path length.');
 end
     
