@@ -1,7 +1,7 @@
 function [Lbfsg, Lb0p, Lb0b] = pl_los(d, f, p, b0, w, temp, press, dlt, dlr)
-%pl_los Line-of-sight transmission loss according to ITU-R P.452-16
+%pl_los Line-of-sight transmission loss according to ITU-R P.452-17
 %     This function computes line-of-sight transmission loss (including short-term effects)
-%     as defined in ITU-R P.452-16.
+%     as defined in ITU-R P.452-17.
 %
 %     Input parameters:
 %     d       -   Great-circle path distance (km)
@@ -32,6 +32,7 @@ function [Lbfsg, Lb0p, Lb0b] = pl_los(d, f, p, b0, w, temp, press, dlt, dlr)
 %     Rev   Date        Author                          Description
 %     -------------------------------------------------------------------------------
 %     v0    04FEB14     Ivica Stevanovic, OFCOM         First implementation in matlab
+%     v1    26OCT21     Ivica Stevanovic, OFCOM         aligned equation (8) with IT-R P.452-17
 
 T = temp + 273.15;
 
@@ -45,7 +46,8 @@ Ag = (g_0 + g_w) * d;  %(9)
 
 % Basic transmission loss due to free-space propagation and attenuation
 % by atmospheric gases
-Lbfsg = 92.5 + 20.0*log10(f) + 20.0*log10(d) + Ag;  % (8)
+%Lbfsg = 92.5 + 20.0*log10(f) + 20.0*log10(d) + Ag;  % (8)
+Lbfsg = 92.4 + 20.0*log10(f) + 20.0*log10(d) + Ag;  % (8)
 
 % Corrections for multipath and focusing effects at p and b0
 Esp = 2.6 * (1 - exp(-0.1 * (dlt + dlr) ) ) * log10(p/50);   %(10a)
