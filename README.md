@@ -59,8 +59,8 @@ Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN
 |-------------------|--------|-------|--------------|--------------|
 | `ha_t`           | scalar double    | m      |             | Clutter nominal height at the Tx side |
 | `ha_r`           | scalar double    | m      |             | Clutter nominal height at the Rx side |
-| `dk_t`           | scalar double    | m      |             | Clutter nominal distance at the Tx side |
-| `dk_r`           | scalar double    | m      |             | Clutter nominal distance at the Rx side |
+| `dk_t`           | scalar double    | km      |             | Clutter nominal distance at the Tx side |
+| `dk_r`           | scalar double    | km      |             | Clutter nominal distance at the Rx side |
 
 
 
