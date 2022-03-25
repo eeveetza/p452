@@ -9,431 +9,396 @@
 % Author: Ivica Stevanovic (IS), Federal Office of Communications, Switzerland
 % Revision History:
 % Date            Revision
+% 16FEB22         Created - transliterated validation examples using .csv instead of .xlsx
+%                 Created new validate_p452_csv.m that
+%                 These are meant to replace the previous version working
+%                 with Excel files. The advantage: it works in both MATLAB
+%                 and Octave, Windows and MacOS and it is easier to diff
 % 13JUL21         Renaming subfolder "src" into "private" which is automatically in the MATLAB search path
 %                                                       (as suggested by K. Konstantinou, Ofcom UK)
 % 05JUN2020       Introduced Octave specific code (with M. Rohner, LS telcom)
 % 16JUN2016       Initial version (IS)
 
 
-if (ispc)
+
+
+clear all;
+close all;
+fclose all;
+
+tol = 1e-6;
+success = 0;
+total = 0;
+
+flag_createlog = 0;
+
+%% compute the path profile parameters
+s = pwd;
+
+% path to the folder containing test profiles
+test_profiles = [s '/validation_examples/profiles/'];
+test_results  = [s '/validation_examples/results/'];
+
+
+
+%% begin code
+% Collect all the filenames .csv in the folder pathname that contain the profile data
+filenames = dir(fullfile(test_profiles, '*.csv')); % filenames(i).name is the filename
+
+
+% start excel application
+if(isOctave)
+    pkg load windows
+end
+
+for iname = 1 : length(filenames)
     
-    clear all;
-    close all;
-    fclose all;
-    
-    tol = 1e-4;
-    success = 0;
-    total = 0;
-    
-    %% compute the path profile parameters
-    s = pwd;
-    % if ~exist('p676d11_ga.m','file')
-    %     addpath ([s '/src/'])
-    % end
-    
-    % path to the folder containing test profiles
-    test_profiles = [s '/validation_examples/'];
+    filename1 = filenames(iname).name;
+    fprintf(1,'***********************************************\n');
+    fprintf(1,'Processing file %s ...\n', filename1);
+    fprintf(1,'***********************************************\n');
     
     
+    failed = false;
+    clear p452 z
     
-    %% begin code
-    % Collect all the filenames .csv in the folder pathname that contain the profile data
-    filenames = dir(fullfile(test_profiles, '*.xlsx')); % filenames(i).name is the filename
     
-    try
-        % start excel application
-        if(isOctave)
-            pkg load windows
-        end
-        e = actxserver ('Excel.Application');
-        %for iname = 1:1
-        for iname = 1 : length(filenames)
-            %filename1 = 'test_profile_mixed_109km.xlsx'
-            filename1 = filenames(iname).name;
-            fprintf(1,'***********************************************\n');
-            fprintf(1,'Processing file %s ...\n', filename1);
-            fprintf(1,'***********************************************\n');
-            
-            
-            failed = false;
-            clear p452 z
-            
-            
-            %% open the excel file
-            if (~isOctave) %Matlab specific code for reading Excel files
-                fid = e.Workbooks.Open([test_profiles filename1]);
-                %% read the worksheet path profile
-                shid = e.Worksheets.get('Item','Path profile');
-                n =  shid.Range('A2').End('xlDown').Row;
-                col = shid.Range(['A2:A' num2str(n)]).Value;
-                p452.path.d = cell2mat(col).';
-                col = shid.Range(['B2:B' num2str(n)]).Value;
-                p452.path.h = cell2mat(col).';
-                col = shid.Range(['C2:C' num2str(n)]).Value;
-                for i = 1:length(col)
-                    if strcmp(col{i}, 'A2')
-                        z(i) = 2;
-                    elseif strcmp(col{i}, 'A1')
-                        z(i) = 1;
-                    elseif strcmp(col{i}, 'B')
-                        z(i) = 3;
-                    end
-                end
-                p452.path.zone = z;
-                
-                %% read the worksheet Input parameters
-                shid = e.Worksheets.get('Item','Input parameters');
-                n =  shid.Range('A2').End('xlDown').Row;
-                instr = shid.Range(['A2:A' num2str(n)]).Value;
-                value = shid.Range(['B2:B' num2str(n)]).Value;
-                for i = 1: length(value)
-                    p452.(instr{i}) = value{i};
-                end
-                if p452.polarization == 'v'
-                    p452.pol = 2;
-                else
-                    p452.pol = 1;
-                end
-                
-                %% read reference path profile parameters
-                
-                shid = e.Worksheets.get('Item','Path profile parameters');
-                n =  shid.Range('A2').End('xlDown').Row;
-                instr = shid.Range(['A2:A' num2str(n)]).Value;
-                value = shid.Range(['B2:B' num2str(n)]).Value;
-                for i = 1: length(value)
-                    ppref.(instr{i}) = value{i};
-                end
-                
-                if strcmp(ppref.path,'Line of Sight')
-                    ppref.pathtype = 1;
-                else
-                    ppref.pathtype = 2;
-                end
-                
-            else % Octave specific code for reading Excel files
-                
-                %% open the excel file
-                
-                fid = e.Workbooks.Open([test_profiles filename1]);
-                %% read the worksheet path profile
-                shid = e.Worksheets(1);
-                
-                ur = shid.UsedRange.Value;
-                %n =  size(ur)(1)
-                n =  size(ur,1);
-                
-                col = ur(2:n,1);
-                p452.path.d = cell2mat(col).';
-                col = ur(2:n,2);
-                p452.path.h = cell2mat(col).';
-                col = ur(2:n,3);
-                col(strcmp ("A2", col)) = 2;
-                col(strcmp ("A1", col)) = 1;
-                col(strcmp ("B", col)) = 3;
-                p452.path.zone = cell2mat(col).';
-                
-                %% read the worksheet Input parameters
-                shid = e.Worksheets(2);
-                ur = shid.UsedRange.Value;
-                %n = size(ur(:,1))(1);
-                n = size(ur(:,1),1);
-                instr = shid.Range(['A2:A' num2str(n)]).Value;
-                value = shid.Range(['B2:B' num2str(n)]).Value;
-                for i = 1: length(value)
-                    p452.(instr{i}) = value{i};
-                end
-                if p452.polarization == 'v'
-                    p452.pol = 2;
-                else
-                    p452.pol = 1;
-                end
-                
-                %% read reference path profile parameters
-                
-                shid = e.Worksheets(3);
-                ur = shid.UsedRange.Value;
-                n = size(ur(:,1),1);
-                instr = shid.Range(['A2:A' num2str(n)]).Value;
-                value = shid.Range(['B2:B' num2str(n)]).Value;
-                for i = 1: length(value)
-                    ppref.(instr{i}) = value{i};
-                end
-                
-                if strcmp(ppref.path,'Line of Sight')
-                    ppref.pathtype = 1;
-                else
-                    ppref.pathtype = 2;
-                end
-                
-            end
-            
-            %[dc, hc, zonec, htgc, hrgc, Aht, Ahr] = closs_corr(p452.f, p452.path.d, p452.path.h, p452.path.zone, p452.htg, p452.hrg, p452.ha_t, p452.ha_r, p452.dk_t, p452.dk_r);
-            
-            dc = p452.path.d;
-            hc = p452.path.h;
-            zonec = p452.path.zone;
-            htgc = p452.htg;
-            hrgc = p452.hrg;
-            
-            % Path center latitude
-            % (great circle calculation according to
-            % P.2001 Annex H maybe more appropriate for longer paths)
-            phi_path = (p452.phi_t + p452.phi_r)/2;
-            
-            % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
-            zone_r = 12;
-            dtm = longest_cont_dist(p452.path.d, p452.path.zone, zone_r);
-            
-            % Compute  dlm     -   the longest continuous inland section of the great-circle path (km)
-            zone_r = 2;
-            dlm = longest_cont_dist(p452.path.d, p452.path.zone, zone_r);
-            
-            % Compute b0
-            b0 = beta0(phi_path, dtm, dlm);
-            
-            [ae, ab] = earth_rad_eff(p452.DN);
-            
-            [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(dc, hc, htgc, hrgc, ae, p452.f);
-            
-            dtot = dc(end)-dc(1);
-            
-            %Tx and Rx antenna heights above mean sea level amsl (m)
-            hts = hc(1) + htgc;
-            hrs = hc(end) + hrgc;
-            
-            % Compute the path fraction over see
-            
-            omega = path_fraction(p452.path.d, p452.path.zone, 3);
-            
-            out.ae = ae;
-            out.dtot = dtot;
-            out.hts = hts;
-            out.hrs = hrs;
-            out.theta_t = theta_t;
-            out.theta_r = theta_r;
-            out.theta = theta;
-            out.hm = hm;
-            out.hte = hte;
-            out.hre = hre;
-            out.hstd = hstd;
-            out.hsrd = hsrd;
-            out.dlt = dlt;
-            out.dlr = dlr;
-            out.pathtype = pathtype;
-            out.dtm = dtm;
-            out.dlm = dlm;
-            out.b0 = b0;
-            out.omega = omega;
-            
-            %% verify the results out against reference ppref
-            if (~isOctave)
-                flds = fields(out);
-                for i = 1:length(flds)
-                    error = abs(out.(flds{i})-ppref.(flds{i}));
-                    if error > tol
-                        fprintf(1,'Error in %s larger than tolerance %g: %g\n', flds{i}, tol, error);
-                        failed = true;
-                    end
-                end
-            end
-            
-            %% read reference transmission loss parameters
-            if (~isOctave) % Matlab specific functions for reading Excel
-                shid = e.Worksheets.get('Item','Transmission losses');
-                n =  shid.Range('A3').End('xlDown').Row;
-                ff = shid.Range(['A3:A' num2str(n)]).Value;
-                pp = shid.Range(['B3:B' num2str(n)]).Value;
-                Lb_ref = shid.Range(['C3:C' num2str(n)]).Value;
-                Lbfsg_ref = shid.Range(['D3:D' num2str(n)]).Value;
-                Lb0p_ref = shid.Range(['E3:E' num2str(n)]).Value;
-                Lb0b_ref = shid.Range(['F3:F' num2str(n)]).Value;
-                Ldsph_ref = shid.Range(['G3:G' num2str(n)]).Value;
-                Ld50_ref = shid.Range(['H3:H' num2str(n)]).Value;
-                Ldp_ref = shid.Range(['I3:I' num2str(n)]).Value;
-                Lbs_ref = shid.Range(['J3:J' num2str(n)]).Value;
-                Lba_ref = shid.Range(['K3:K' num2str(n)]).Value;
-                
-            else % octave specific functions for reading Excel files
-                
-                shid = e.Worksheets(4);
-                ur = shid.UsedRange.Value;
-                %n = size(ur(:,1))(1);
-                n = size(ur(:,1),1);
-                ff = shid.Range(['A3:A' num2str(n)]).Value;
-                pp = shid.Range(['B3:B' num2str(n)]).Value;
-                Lb_ref = shid.Range(['C3:C' num2str(n)]).Value;
-                Lbfsg_ref = shid.Range(['D3:D' num2str(n)]).Value;
-                Lb0p_ref = shid.Range(['E3:E' num2str(n)]).Value;
-                Lb0b_ref = shid.Range(['F3:F' num2str(n)]).Value;
-                Ldsph_ref = shid.Range(['G3:G' num2str(n)]).Value;
-                Ld50_ref = shid.Range(['H3:H' num2str(n)]).Value;
-                Ldp_ref = shid.Range(['I3:I' num2str(n)]).Value;
-                Lbs_ref = shid.Range(['J3:J' num2str(n)]).Value;
-                Lba_ref = shid.Range(['K3:K' num2str(n)]).Value;
-                
-            end
-            % compute the transmission losses from MATLAB functions
-            
-            offset = 0;
-            for i = 1:n-2
-                [Lbfsg{offset + i}, Lb0p{offset + i}, Lb0b{offset + i}] = pl_los(dtot, ...
-                    ff{i}, ...
-                    pp{i}, ...
-                    b0, ...
-                    omega, ...
-                    p452.temp, ...
-                    p452.press,...
-                    dlt, ...
-                    dlr);
-                
-                Lbs{offset + i} = tl_tropo(dtot, ...
-                    theta, ...
-                    ff{i}, ...
-                    pp{i}, ...
-                    p452.temp, ...
-                    p452.press, ...
-                    p452.N0, ...
-                    p452.Gt, ...
-                    p452.Gr );
-                
-                
-                Lba{offset + i} = tl_anomalous(dtot, ...
-                    dlt, ...
-                    dlr, ...
-                    p452.dct, ...
-                    p452.dcr, ...
-                    dlm, ...
-                    hts, ...
-                    hrs, ...
-                    hte, ...
-                    hre, ...
-                    hm, ...
-                    theta_t, ...
-                    theta_r, ...
-                    ff{i}, ...
-                    pp{i}, ...
-                    p452.temp, ...
-                    p452.press, ...
-                    omega, ...
-                    ae, ...
-                    b0);
-                
-                Lbulla{offset + i} = dl_bull(dc, hc, hts, hrs, ae, ff{i});
-                
-                % Use the method in 4.2.1 for a second time, with all profile heights hi
-                % set to zero and modified antenna heights given by
-                
-                hts1 = hts - hstd;   % eq (38a)
-                hrs1 = hrs - hsrd;   % eq (38b)
-                h1 = zeros(size(hc));
-                
-                % where hstd and hsrd are given in 5.1.6.3 of Attachment 2. Set the
-                % resulting Bullington diffraction loss for this smooth path to Lbulls
-                
-                Lbulls{offset + i} = dl_bull(dc, h1, hts1, hrs1, ae, ff{i});
-                
-                % Use the method in 4.2.2 to radiomaps the spherical-Earth diffraction loss
-                % for the actual path length (dtot) with
-                
-                hte1 = hts1;             % eq (39a)
-                hre1 = hrs1;             % eq (39b)
-                
-                Ldsph{offset + i} = dl_se(dtot, hte1, hre1, ae, ff{i}, omega);
-                
-                % Diffraction loss for the general paht is now given by
-                
-                Ld{offset + i}(1) = Lbulla{offset + i} + max(Ldsph{offset + i}(1) - Lbulls{offset + i}, 0);  % eq (40)
-                Ld{offset + i}(2) = Lbulla{offset + i} + max(Ldsph{offset + i}(2) - Lbulls{offset + i}, 0);  % eq (40)%%
-                
-                [ Ldp{offset+i}, Ld50{offset+i} ] = dl_p( dc, hc, hts, hrs, hstd, hsrd, ff{i}, omega, pp{i}, b0, p452.DN );
-                
-                Lb{offset+i} = tl_p452_pdr(ff{i}, ...
-                    pp{i}, ...
-                    p452.path.d, ...
-                    p452.path.h, ...
-                    p452.path.zone, ...
-                    p452.path.h, ... % clutter + terrain profile along the path - here we assume clutter = 0 for validation purposes
-                    p452.htg, ...
-                    p452.hrg, ...
-                    p452.phi_t,...
-                    p452.phi_r, ...
-                    p452.Gt, ...
-                    p452.Gr, ...
-                    p452.pol, ...
-                    p452.dct, ...
-                    p452.dcr, ...
-                    p452.DN, ...
-                    p452.N0, ...
-                    p452.press, ...
-                    p452.temp);
-                
-                out1.Lbfsg(i+offset) = Lbfsg{i}-Lbfsg_ref{i};
-                out1.Lb0p(i+offset) = Lb0p{i}-Lb0p_ref{i};
-                out1.Lb0b(i+offset) = Lb0b{i}-Lb0b_ref{i};
-                out1.Ldsph(i+offset) = Ldsph{i}(p452.pol)-Ldsph_ref{i};
-                out1.Ld50(i+offset) = Ld50{i}(p452.pol)-Ld50_ref{i};
-                out1.Ldp(i+offset) = Ldp{i}(p452.pol)-Ldp_ref{i};
-                out1.Lbs(i+offset) = Lbs{i}-Lbs_ref{i};
-                out1.Lba(i+offset) = Lba{i}-Lba_ref{i};
-                out1.Lb(i+offset) = Lb{i}-Lb_ref{i};
-                
-                
-            end
-            
-            %% verify error in results out1 against tolarance
-            if (~isOctave)
-                flds = fields(out1);
-                for i = 1:length(flds)
-                    maxi = max(abs(out1.(flds{i})));
-                    kk = find(maxi > tol);
-                    if ~isempty(kk)
-                        for kki = 1:length(kk)
-                            fprintf(1,'Maximum deviation found in %s larger than tolerance %g:  %g\n', flds{i}, tol, maxi(kk(kki)));
-                            failed = true;
-                        end
-                    end
-                end
-            end
-            
-            
-            if(isOctave)
-                delete (shid);
-            end
-            fid.Close(false);
-            
-            if (~failed)
-                success = success + 1;
-            end
-            total = total + 1;
-            
-        end
-        
-        %# close Excel
-        if(isOctave)
-            e.Quit();
-            delete(e);
-        else
-            e.Quit();
-            e.delete();
-        end
-        
-        fprintf(1, 'Validation results: %d out of %d tests passed successfully.\n', success, total);
-        if (success == total)
-            fprintf(1,'The deviation from the reference results is smaller than %g dB.\n', tol);
-        end
-        
-    catch ME
-        if(isOctave)
-            e.Quit();
-            delete(e);
-        else
-            e.Quit();
-            e.delete();
-        end
-        rethrow(ME)
+    % read the path profile
+    X = readcsv([test_profiles  filename1]);
+    
+    p452.path.d = str2double( X(:,1) );
+    p452.path.h = str2double( X(:,2) );
+    p452.path.zone = str2double( X(:,4) );
+    
+    
+    fname_part = filename1(13:end);
+    test_result = ['test_result' fname_part] ;
+    if(flag_createlog)
+        fidlog = fopen(test_result, 'w');
+        fprintf(fidlog,'profile,f (GHz),p (%%),htg (m),hrg (m),phi_path (deg),Gt (dBi),Gr (dBi),pol (1-h/2-v),dct (km),dcr (km),DN (N-units/km),N0 (N-units),press (hPa),temp (deg C),ha_t (m),ha_r (m),dk_t (km),dk_r (km),ae,dtot,hts,hrs,theta_t,theta_r,theta,hm,hte,hre,hstd,hsrd,dlt,dlr,path,dtm,dlm,b0,omega,Lb,Lbfsg,Lb0p,Lb0b,Ldsph,Ld50,Ldp,Lbs,Lba\n');
+    end
+    % read the input arguments and reference values
+    
+    Y = readcsv([test_results  test_result]);
+    
+    
+    [nrows, ncols] = size(Y);
+    ff = zeros(nrows,1);
+    for i = 1:nrows
+        ff(i)    = str2double(Y(i,2));
+        pp(i)    = str2double(Y(i,3));
     end
     
-else
-    disp('Platform not supported. This script runs only on Windows.')
+    p452.htg     = str2double(Y(1,4));
+    p452.hrg     = str2double(Y(1,5));
+    p452.phi_path   = str2double(Y(1,6));
+    p452.Gt      = str2double(Y(1,7));
+    p452.Gr      = str2double(Y(1,8));
+    p452.pol     = str2double(Y(1,9));
+    p452.dct     = str2double(Y(1,10));
+    p452.dcr     = str2double(Y(1,11));
+    p452.DN      = str2double(Y(1,12));
+    p452.N0      = str2double(Y(1,13));
+    p452.press   = str2double(Y(1,14));
+    p452.temp    = str2double(Y(1,15));
+    p452.ha_t    = str2double(Y(1,16));
+    p452.ha_r    = str2double(Y(1,17));
+    p452.dk_t    = str2double(Y(1,18));
+    p452.dk_r    = str2double(Y(1,19));
+    
+    ppref.ae      =  str2double(Y(1,20));
+    ppref.dtot    =  str2double(Y(1,21));
+    ppref.hts     =  str2double(Y(1,22));
+    ppref.hrs     =  str2double(Y(1,23));
+    ppref.theta_t =  str2double(Y(1,24));
+    ppref.theta_r =  str2double(Y(1,25));
+    ppref.theta   =  str2double(Y(1,26));
+    ppref.hm      =  str2double(Y(1,27));
+    ppref.hte     =  str2double(Y(1,28));
+    ppref.hre     =  str2double(Y(1,29));
+    ppref.hstd    =  str2double(Y(1,30));
+    ppref.hsrd    =  str2double(Y(1,31));
+    ppref.dlt     =  str2double(Y(1,32));
+    ppref.dlr     =  str2double(Y(1,33));
+    ppref.path    =  (Y(1,34));
+    ppref.dtm     =  str2double(Y(1,35));
+    ppref.dlm     =  str2double(Y(1,36));
+    ppref.b0      =  str2double(Y(1,37));
+    ppref.omega   =  str2double(Y(1,38));
+    
+    if strcmp(ppref.path,'Line of Sight')
+        ppref.pathtype = 1;
+    else
+        ppref.pathtype = 2;
+    end
+    
+    
+    %[dc, hc, zonec, htgc, hrgc, Aht, Ahr] = closs_corr(ff(1), p452.path.d, p452.path.h, p452.path.zone, p452.htg, p452.hrg, p452.ha_t, p452.ha_r, p452.dk_t, p452.dk_r);
+    dc = p452.path.d;
+    hc = p452.path.h;
+    zonec = p452.path.zone;
+    htgc = p452.htg;
+    hrgc = p452.hrg;
+    
+    % Path center latitude
+    phi_path = p452.phi_path;
+    
+    % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
+    zone_r = 12;
+    dtm = longest_cont_dist(p452.path.d, p452.path.zone, zone_r);
+    
+    % Compute  dlm     -   the longest continuous inland section of the great-circle path (km)
+    zone_r = 2;
+    dlm = longest_cont_dist(p452.path.d, p452.path.zone, zone_r);
+    
+    % Compute b0
+    b0 = beta0(phi_path, dtm, dlm);
+    
+    [ae, ab] = earth_rad_eff(p452.DN);
+    
+    [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(dc, hc, htgc, hrgc, ae, ff(1));
+    
+    dtot = dc(end)-dc(1);
+    
+    %Tx and Rx antenna heights above mean sea level amsl (m)
+    hts = hc(1) + htgc;
+    hrs = hc(end) + hrgc;
+    
+    % Compute the path fraction over see
+    
+    omega = path_fraction(p452.path.d, p452.path.zone, 3);
+    
+    out.ae = ae;
+    out.dtot = dtot;
+    out.hts = hts;
+    out.hrs = hrs;
+    out.theta_t = theta_t;
+    out.theta_r = theta_r;
+    out.theta = theta;
+    out.hm = hm;
+    out.hte = hte;
+    out.hre = hre;
+    out.hstd = hstd;
+    out.hsrd = hsrd;
+    out.dlt = dlt;
+    out.dlr = dlr;
+    out.pathtype = pathtype;
+    out.dtm = dtm;
+    out.dlm = dlm;
+    out.b0 = b0;
+    out.omega = omega;
+    
+    %% verify the results struct `out` against the reference struct `ppref`
+    
+    flds = fieldnames(out);
+    for i = 1:length(flds)
+        error = abs(out.(flds{i})-ppref.(flds{i}));
+        if error > tol
+            fprintf(1,'Error in %s larger than tolerance %g: %g\n', flds{i}, tol, error);
+            failed = true;
+        end
+    end
+    
+   
+    
+    % extract reference transmission losses
+    
+    Lb_ref    = str2double(Y(:,39));
+    Lbfsg_ref = str2double(Y(:,40));
+    Lb0p_ref  = str2double(Y(:,41));
+    Lb0b_ref  = str2double(Y(:,42));
+    Ldsph_ref = str2double(Y(:,43));
+    Ld50_ref  = str2double(Y(:,44));
+    Ldp_ref   = str2double(Y(:,45));
+    Lbs_ref   = str2double(Y(:,46));
+    Lba_ref   = str2double(Y(:,47));
+    
+    
+    % compute the transmission losses using MATLAB functions
+    Lbfsg = zeros(nrows,1);
+    Lb0p = zeros(nrows, 1);
+    Lb0b = zeros(nrows, 1);
+    Lbs = zeros(nrows, 1);
+    Lba = zeros(nrows, 1);
+    Lbulla = cell(nrows, 1);
+    Lbulls = cell(nrows, 1);
+    Ldsph = cell(nrows, 1);
+    Ld = cell(nrows, 1);
+    Ldp = cell(nrows, 1);
+    Ld50 = cell(nrows, 1);
+    Lb = zeros(nrows,1);
+    
+    offset = 0;
+    for i = 1:nrows
+        [Lbfsg(offset + i), Lb0p(offset + i), Lb0b(offset + i)] = pl_los(dtot, ...
+            ff(i), ...
+            pp(i), ...
+            b0, ...
+            omega, ...
+            p452.temp, ...
+            p452.press,...
+            dlt, ...
+            dlr);
+        
+        Lbs(offset + i) = tl_tropo(dtot, ...
+            theta, ...
+            ff(i), ...
+            pp(i), ...
+            p452.temp, ...
+            p452.press, ...
+            p452.N0, ...
+            p452.Gt, ...
+            p452.Gr );
+        
+        
+        Lba(offset + i) = tl_anomalous(dtot, ...
+            dlt, ...
+            dlr, ...
+            p452.dct, ...
+            p452.dcr, ...
+            dlm, ...
+            hts, ...
+            hrs, ...
+            hte, ...
+            hre, ...
+            hm, ...
+            theta_t, ...
+            theta_r, ...
+            ff(i), ...
+            pp(i), ...
+            p452.temp, ...
+            p452.press, ...
+            omega, ...
+            ae, ...
+            b0);
+        
+        Lbulla{offset + i} = dl_bull(dc, hc, hts, hrs, ae, ff(i));
+        
+        % Use the method in 4.2.1 for a second time, with all profile heights hi
+        % set to zero and modified antenna heights given by
+        
+        hts1 = hts - hstd;   % eq (38a)
+        hrs1 = hrs - hsrd;   % eq (38b)
+        h1 = zeros(size(hc));
+        
+        % where hstd and hsrd are given in 5.1.6.3 of Attachment 2. Set the
+        % resulting Bullington diffraction loss for this smooth path to Lbulls
+        
+        Lbulls{offset + i} = dl_bull(dc, h1, hts1, hrs1, ae, ff(i));
+        
+        % Use the method in 4.2.2 to radiomaps the spherical-Earth diffraction loss
+        % for the actual path length (dtot) with
+        
+        hte1 = hts1;             % eq (39a)
+        hre1 = hrs1;             % eq (39b)
+        
+        Ldsph{offset + i} = dl_se(dtot, hte1, hre1, ae, ff(i), omega);
+        
+        % Diffraction loss for the general paht is now given by
+        
+        Ld{offset + i}(1) = Lbulla{offset + i} + max(Ldsph{offset + i}(1) - Lbulls{offset + i}, 0);  % eq (40)
+        Ld{offset + i}(2) = Lbulla{offset + i} + max(Ldsph{offset + i}(2) - Lbulls{offset + i}, 0);  % eq (40)%%
+        
+        [ Ldp{offset+i}, Ld50{offset+i} ] = dl_p( dc, hc, hts, hrs, hstd, hsrd, ff(i), omega, pp(i), b0, p452.DN );
+        
+        Lb(offset+i) = tl_p452_pdr(ff(i), ...
+            pp(i), ...
+            p452.path.d, ...
+            p452.path.h, ...
+            p452.path.zone, ...
+            p452.path.h, ... % clutter + terrain profile along the path - here we assume clutter = 0 for validation purposes
+            p452.htg, ...
+            p452.hrg, ...
+            p452.phi_path,...
+            p452.Gt, ...
+            p452.Gr, ...
+            p452.pol, ...
+            p452.dct, ...
+            p452.dcr, ...
+            p452.DN, ...
+            p452.N0, ...
+            p452.press, ...
+            p452.temp);
+        
+        out1.Lbfsg(i+offset) = Lbfsg(i)-Lbfsg_ref(i);
+        out1.Lb0p(i+offset) = Lb0p(i)-Lb0p_ref(i);
+        out1.Lb0b(i+offset) = Lb0b(i)-Lb0b_ref(i);
+        out1.Ldsph(i+offset) = Ldsph{i}(p452.pol)-Ldsph_ref(i);
+        out1.Ld50(i+offset) = Ld50{i}(p452.pol)-Ld50_ref(i);
+        out1.Ldp(i+offset) = Ldp{i}(p452.pol)-Ldp_ref(i);
+        out1.Lbs(i+offset) = Lbs(i)-Lbs_ref(i);
+        out1.Lba(i+offset) = Lba(i)-Lba_ref(i);
+        out1.Lb(i+offset) = Lb(i)-Lb_ref(i);
+        
+        if(flag_createlog==1)
+         fprintf(fidlog, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f \n', ...
+             Y{i,1}, Y{i,2},Y{i,3},Y{i,4},Y{i,5},num2str(phi_path),Y{i,7},Y{i,8},Y{i,9},...
+             Y{i,10},Y{i,11},Y{i,12},Y{i,13},Y{i,14},Y{i,15},Y{i,16},Y{i,17},Y{i,18},Y{i,19},...
+                ae, ...
+                dtot, ...
+                hts, ...
+                hrs, ...
+                theta_t, ...
+                theta_r, ...
+                theta, ...
+                hm, ...
+                hte, ...
+                hre, ...
+                hstd, ...
+                hsrd, ...
+                dlt, ...
+                dlr, ...
+                Y{1,34}, ...
+                dtm, ...
+                dlm, ...
+                b0, ...
+                omega, ...
+                Lb(i), ...
+                Lbfsg(i), ...
+                Lb0p(i), ...
+                Lb0b(i), ...
+                Ldsph{i}(p452.pol), ...
+                Ld50{i}(p452.pol), ...
+                Ldp{i}(p452.pol), ...
+                Lbs(i), ...
+                Lba(i) ...
+             );
+        
+        end
+    end
+    
+    %% verify error in the results out1 against tolarance
+    
+    flds = fieldnames(out1);
+    for i = 1:length(flds)
+        maxi = max(abs(out1.(flds{i})));
+        kk = find(maxi > tol);
+        if ~isempty(kk)
+            for kki = 1:length(kk)
+                fprintf(1,'Maximum deviation found in %s larger than tolerance %g:  %g\n', flds{i}, tol, maxi(kk(kki)));
+                failed = true;
+            end
+        end
+    end
+    
+    if(flag_createlog)
+        fclose(fidlog);
+    end
+    
+    
+    if (~failed)
+        success = success + 1;
+    end
+    total = total + 1;
+    
 end
+
+
+fprintf(1, 'Validation results: %d out of %d tests passed successfully.\n', success, total);
+if (success == total)
+    fprintf(1,'The deviation from the reference results is smaller than %g dB.\n', tol);
+end
+
+
+
+

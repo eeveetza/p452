@@ -143,7 +143,8 @@ if pathtype == 1
     
     ii = 2:n-1;
     
-    lambda = 0.3/f;
+    % speed of light as per ITU-R P.2001
+    lambda = 0.2998/f;
     Ce = 1/ae;
     
     nu = (h(ii) + 500*Ce*d(ii).*(dtot-d(ii))- (hts*(dtot- d(ii)) + hrs *d(ii))/dtot).* ...

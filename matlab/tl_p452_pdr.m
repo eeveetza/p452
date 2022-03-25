@@ -1,6 +1,6 @@
-function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
-%tl_p452_pdr basic transmission loss according to P.452-16
-%   Lb = tl_p452_pdr(f, p, d, h, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
+function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
+%tl_p452_pdr basic transmission loss according to PDNR P.452-17
+%   Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
 %   as defined in 3M/253 Annex 8 (WP 3M Chairman’s Report 2021) - removing terminal clutter and applying clutter along the path. 
@@ -18,8 +18,7 @@ function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_t, phi_r, Gt, Gr, p
 %     g       -   vector of clutter heights gi along the path 
 %     htg     -   Tx Antenna center heigth above ground level (m)
 %     hrg     -   Rx Antenna center heigth above ground level (m)
-%     phi_t   -   Latitude of Tx station (degrees)
-%     phi_r   -   Latitude of Rx station (degrees)
+%     phi_path-   Latitude of path center between Tx and Rx stations (degrees)
 %     Gt, Gr  -   Antenna gain in the direction of the horizon along the
 %                 great-circle interference path (dBi)
 %     pol     -   polarization of the signal (1) horizontal, (2) vertical
@@ -39,10 +38,10 @@ function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_t, phi_r, Gt, Gr, p
 
 %
 %     Output parameters:
-%     Lb     -   basic  transmission loss according to P.452-17
+%     Lb     -   basic  transmission loss according to PDNR P.452-17
 %
 %     Example:
-%     Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phi_t, phi_r, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
+%     Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
 %    
 
 %     Rev   Date        Author                          Description
@@ -64,8 +63,10 @@ function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_t, phi_r, Gt, Gr, p
 %     v8    08OCT21     Ivica Stevanovic, OFCOM         Ensured that the variable "series" is a row vector in find_intervals.m
 %                                                       Removed height-gain terminal clutter and introduced clutter along the path 
 %                                                       inline with 3M/253 Annex 8 (WP 3M Chairman’s Report 2021)
-
-
+%     v9    25MAR22     Ivica Stevanovic, OFCOM         Introduced path center latitude as input argument (instead of latitudes of Tx and Rx stations) .
+%                                                       Use 2.998e8 m/s instead of 3e8 as speed of light (as per ITU-R P.2001)
+%                                                       Updated the format of validation examples xls -> csv 
+%                                                       
 % MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
 % THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -88,54 +89,13 @@ function Lb = tl_p452_pdr(f, p, d, h, zone, g, htg, hrg, phi_t, phi_r, Gt, Gr, p
 
 % Read the input arguments 
 
-if nargin > 19    warning(strcat('tl_p452_pdr: Too many input arguments; The function requires at most 18',...
+if nargin > 18    warning(strcat('tl_p452_pdr: Too many input arguments; The function requires at most 18',...
         'input arguments. Additional values ignored. Input values may be wrongly assigned.'));
 end
 
-if nargin < 19 
+if nargin < 18 
     error('tl_p452_pdr: function requires at least 18 input parameters.');
 end
-
-% ha_t = [];
-% ha_r = [];
-% dk_t = [];
-% dk_r = [];
-% 
-% narg = 19;
-% 
-% 
-% if nargin >=narg
-%     ha_t=varargin{1};
-%     narg = narg + 1;
-%     if nargin >=narg
-%         ha_r=varargin{2};
-%         narg = narg + 1;
-%         if nargin >=narg
-%             dk_t=varargin{3};
-%             narg = narg + 1;
-%             if nargin >=narg
-%                 dk_r=varargin{4};
-%             end
-%         end
-%     end
-% end
-
-% Compute the path profile parameters
-% Path center latitude
-phi_path = (phi_t + phi_r)/2;
-
-% great circle calculation according to P.2001 Annex H maybe more appropriate for longer paths
-% Phitn = phi_t;
-% Phirn = phi_r;
-% Phite = 0;
-% Phire = 0;
-% 
-
-% Re = 6371;
-% dpnt = 0.5*( d(end)-d(1) );
-% 
-% [Phipnte, Phipntn, Bt2r, dgc] = great_circle_path(Phire, Phite, Phirn, Phitn, Re, dpnt);
-% phi_path = Phipntn;
 
 % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
 zone_r = 12;
@@ -176,10 +136,6 @@ hrs = h(end) + hrg;
 % Effective Earth curvature Ce (km^-1)
 
 Ce = 1/ae;
-
-% Wavelength in meters
-
-lambda = 0.3/f;
 
 
 % Find the intermediate profile point with the highest slope of the line
@@ -265,8 +221,12 @@ Lminbap = eta*log(exp(Lba/eta) + exp(Lb0p/eta));    % eq (61)
 
 Lbda = Lbd;
 
-if Lminbap <= Lbd
-   Lbda = Lminbap + (Lbd-Lminbap)*Fk; 
+if Lminbap <= Lbd(1)
+   Lbda(1) = Lminbap + (Lbd(1)-Lminbap)*Fk; 
+end
+
+if Lminbap <= Lbd(2)
+   Lbda(2) = Lminbap + (Lbd(2)-Lminbap)*Fk; 
 end
 
 % Calculate a modified basic transmission loss, which takes diffraction and

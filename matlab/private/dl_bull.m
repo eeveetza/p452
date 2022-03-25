@@ -30,8 +30,8 @@ function Lbull = dl_bull(d, h, hts, hrs, ap, f)
 Ce = 1/ap;
 
 % Wavelength in meters
-
-lambda = 0.3/f;
+% speed of light as per ITU-R P.2001
+lambda = 0.2998/f;
 
 % Complete path length
 

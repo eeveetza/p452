@@ -30,8 +30,8 @@ function Ldsph = dl_se(d, hte, hre, ap, f, omega)
 %% Body of function
 
 % Wavelength in meters
-
-lambda = 0.3/f;
+% speed of light as per ITU-R P.2001
+lambda = 0.2998/f;
 
 % Calculate the marginal LoS distance for a smooth path
 
@@ -76,12 +76,14 @@ else
         
         Ldft = dl_se_ft(d, hte, hre, aem, f, omega);
         
-        if Ldft < 0
-            Ldsph = [0 0]
-            return
-        else
-            Ldsph = (1- hse/hreq)*Ldft;     % Eq (28)
+        Ldsph = (1- hse/hreq)*Ldft;     % Eq (28)
+        if Ldft(1) < 0
+            Ldsph(1) = 0;
         end
+        if Ldft(2) < 0
+            Ldsph(2) = 0;
+        end
+            
     end
 end
 
