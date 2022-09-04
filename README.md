@@ -1,4 +1,4 @@
-# MATLAB/Octave Implementation of Recommendation ITU-R P.452-17
+# MATLAB/Octave Implementation of Recommendation ITU-R P.452
 
 [![DOI](https://zenodo.org/badge/459621140.svg)](https://zenodo.org/badge/latestdoi/459621140)
 
