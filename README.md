@@ -1,11 +1,12 @@
-# MATLAB/Octave Implementation of Recommendation ITU-R P.452-17
+# MATLAB/Octave Implementation of Recommendation ITU-R P.452
 
+<!---
 [![DOI](https://zenodo.org/badge/459621140.svg)](https://zenodo.org/badge/latestdoi/459621140)
-
+--->
 
 This code repository contains a MATLAB/Octave software implementation of Recommendation [ITU-R P.452-17](https://www.itu.int/rec/R-REC-P.452/en) with a prediction procedure for the evaluation of interference between stations on the surface of the Earth at frequencies above about 0.1 GHz.  
 
-This version of the code corresponds to the reference version approved by ITU-R Working Party 3M and published by Study Group 3 on [ITU-R SG 3 Software, Data, and Validation Web Page](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx).
+This is development code that does not necessarily corresond to the reference version approved by ITU-R Working Party 3M and published by Study Group 3 on [ITU-R SG 3 Software, Data, and Validation Web Page](https://www.itu.int/en/ITU-R/study-groups/rsg3/Pages/iono-tropo-spheric.aspx).
 
 The following table describes the structure of the folder `./matlab/` containing the MATLAB/Octave implementation of Recommendation ITU-R P.452.
 
