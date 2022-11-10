@@ -20,6 +20,8 @@ function   dm = longest_cont_dist(d, zone, zone_r)
 %     -------------------------------------------------------------------------------
 %     v0    22JAN16     Ivica Stevanovic, OFCOM         First implementation in matlab
 %     v1    12FEB16     Ivica Stevanovic, OFCOM         included zone_r==12
+%     v3    10NOV22     Ivica Stevanovic, OFCOM         Corrected a bug in d(start(i))>0
+
 dm = 0;
 
 if zone_r  == 12
@@ -36,7 +38,7 @@ for i = 1:n
     end
     
     if (d(start(i))>0)
-        delta = delta + ( d(stop(i))-d(stop(i)-1) )/2.0;
+        delta = delta + ( d(start(i))-d(start(i)-1) )/2.0;
     end
     
    dm = max(d(stop(i))-d(start(i)) + delta, dm);
