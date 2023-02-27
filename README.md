@@ -1,4 +1,4 @@
-# MATLAB/Octave Implementation of Preliminary Draft Recommendation (PDR) ITU-R P.452-17 with Corner Case Handling
+# MATLAB/Octave Implementation of Preliminary Draft Recommendation (PDR) ITU-R P.452-17 with Distributed Clutter Loss Model and Corner Case Handling
 
 This code repository contains a MATLAB/Octave software implementation of PDR [ITU-R P.452-17](https://www.itu.int/rec/R-REC-P.452/en) with a prediction procedure for the evaluation of interference between stations on the surface of the Earth at frequencies above about 0.1 GHz, as contained in Annex 8 of Working Party 3M Chairman's Report [3M/253 Annex 8](https://www.itu.int/dms_ties/itu-r/md/19/wp3m/c/R19-WP3M-C-0253!N08!MSW-E.docx), implementing clutter loss along the path on top of ITU-R P.452-17 (instead of terminal clutter loss). 
 This code implements corner case handling.
