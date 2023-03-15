@@ -13,7 +13,7 @@ function [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta_
 %
 % Output parameters:
 %
-% hst, hsr     -   Tx and Rx antenna heigts of the smooth-Earth surface amsl (m)
+% hst, hsr     -   Tx and Rx antenna heights of the smooth-Earth surface amsl (m)
 % hstd, hsrd   -   Tx and Rx effective antenna heigts for the diffraction model (m)
 % hte, hre     -   Tx and Rx terminal effective heights for the ducting/layer reflection model (m)
 % hm           -   The terrain roughness parameter (m)

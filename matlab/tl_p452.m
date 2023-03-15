@@ -1,6 +1,6 @@
-function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, varargin)
+function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, varargin)
 %tl_p452 basic transmission loss according to ITU-R P.452-17
-%   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r )
+%   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, ha_t, ha_r, dk_t, dk_r )
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
 %   as defined in ITU-R P.452-17 (Section 4.6). Other functions called from
@@ -16,23 +16,19 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dc
 %     zone    -   Zone type: Coastal land (1), Inland (2) or Sea (3)
 %     htg     -   Tx Antenna center heigth above ground level (m)
 %     hrg     -   Rx Antenna center heigth above ground level (m)
-%     phi_path-   Latitude of Tx-Rx path center (degrees)
+%     phit_e  -   Tx Longitude (degrees)
+%     phit_n  -   Tx Latitude  (degrees)
+%     phir_e  -   Rx Longitude (degrees)
+%     phir_n  -   Rx Latitude  (degrees)
 %     Gt, Gr  -   Antenna gain in the direction of the horizon along the
 %                 great-circle interference path (dBi)
 %     pol     -   polarization of the signal (1) horizontal, (2) vertical
 %     dct     -   Distance over land from the transmit and receive
 %     dcr         antennas to the coast along the great-circle interference path (km).
 %                 Set to zero for a terminal on a ship or sea platform
-%     DN      -   The average radio-refractive index lapse-rate through the
-%                 lowest 1 km of the atmosphere (it is a positive quantity in this
-%                 procedure) (N-units/km)
-%     N0      -   The sea-level surface refractivity, is used only by the
-%                 troposcatter model as a measure of location variability of the
-%                 troposcatter mechanism. The correct values of DN and N0 are given by
-%                 the path-centre values as derived from the appropriate
-%                 maps (N-units)
 %     press   -   Dry air pressure (hPa)
 %     temp    -   Air temperature (degrees C)
+%     pdr     -   pdr flag = 1, use PDR Troposcatter model
 %     ha_t    -   Clutter nominal height (m) at the Tx side
 %     ha_r    -   Clutter nominal height (m) at the Rx side
 %     dk_t    -   Clutter nominal distance (km) at the Tx side
@@ -42,8 +38,8 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dc
 %     Lb     -   basic  transmission loss according to ITU-R P.452-17
 %
 %     Example:
-%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp)
-%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dcr, DN, N0, press, temp, ha_t, ha_r, dk_t, dk_r)
+%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr)
+%     Lb = tl_p452(f, p, d, h, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, ha_t, ha_r, dk_t, dk_r)
 
 %     Rev   Date        Author                          Description
 %     -------------------------------------------------------------------------------
@@ -63,6 +59,7 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dc
 %                                                       (as suggested by K. Konstantinou, Ofcom UK)   
 %     v8    08OCT21     Ivica Stevanovic, OFCOM         Ensured that the variable "series" is a row vector in find_intervals.m
 %     v9    24MAR22     Ivica Stevanovic, OFCOM         Introduced path center latitude as input argument (instead of Tx/Rx latitudes) 
+%     v10   15MAR23     Ivica Stevanovic, OFCOM         Introduced troposcatter prediction model according to 3M/364 Annex 2
 % MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
 % The Software is provided "AS IS" WITH NO WARRANTIES, EXPRESS OR IMPLIED, 
@@ -82,12 +79,12 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phi_path, Gt, Gr, pol, dct, dc
 
 % Read the input arguments 
 
-if nargin > 21    warning(strcat('tl_p452: Too many input arguments; The function requires at most 21',...
+if nargin > 23    warning(strcat('tl_p452: Too many input arguments; The function requires at most 21',...
         'input arguments. Additional values ignored. Input values may be wrongly assigned.'));
 end
 
-if nargin <17 
-    error('tl_p452: function requires at least 17 input parameters.');
+if nargin <19 
+    error('tl_p452: function requires at least 19 input parameters.');
 end
 
 ha_t = [];
@@ -95,7 +92,7 @@ ha_r = [];
 dk_t = [];
 dk_r = [];
 
-narg = 18;
+narg = 20;
 
 
 if nargin >=narg
@@ -117,7 +114,7 @@ end
 % verify input argument values and limits
 check_limit(f, 0.1, 50.0, 'f [GHz]');
 check_limit(p, 0.001, 50, 'p [%]');
-check_limit(phi_path, -90, 90, 'phi_path [deg]');
+% check_limit(phi_path, -90, 90, 'phi_path [deg]'); todo: check longitudes and latitudes
 check_limit(dct, 0, inf, 'dct [km]');
 check_limit(dcr, 0, inf, 'dcr [km]');
 check_value(pol, [1, 2], 'Polarization (pol) ');
@@ -138,8 +135,34 @@ dtm = longest_cont_dist(d, zone, zone_r);
 zone_r = 2;
 dlm = longest_cont_dist(d, zone, zone_r);
 
+% Calculate the longitude and latitude of the mid-point of the path, phim_e,
+% and phim_n for dpnt = 0.5dt
+Re = 6371;
+dpnt = 0.5*(d(end)-d(1));
+[phim_e, phim_n, bt2r, dgc] = great_circle_path(phir_e, phit_e, phir_n, phit_n, Re, dpnt);
+
+DN50 = DigitalMaps_DN50();
+N050 = DigitalMaps_N050();
+
+latcnt = 90:-1.5:-90;               %Table 2.4.1
+loncnt = 0:1.5:360;                 %Table 2.4.1  
+[LON,LAT] = meshgrid(loncnt, latcnt);
+
+% Map phicve (-180, 180) to loncnt (0,360);
+phim_e1 = phim_e;
+if phim_e1 < 0
+    phim_e1 = phim_e + 360;
+end
+
+% Find radio-refractivity lapse rate dN 
+% using the digital maps at phim_e (lon), phim_n (lat) - as a bilinear interpolation
+
+DN = interp2(LON,LAT,DN50,phim_e1,phim_n);
+N0 = interp2(LON,LAT,N050,phim_e1,phim_n);
+clear DN50 N050
+
 % Compute b0
-b0 = beta0(phi_path, dtm, dlm);
+b0 = beta0(phim_n, dtm, dlm);
 
 [ae, ab] = earth_rad_eff(DN);
 
@@ -260,10 +283,36 @@ end
 
 Lbam = Lbda + (Lminb0p - Lbda)*Fj;   % eq (63)
 
-% Calculate the basic transmission loss due to troposcatter not exceeded
-% for any time percantage p 
+% Calculate the basic transmission loss due to troposcatter not exceeded for any time percantage p 
 
-Lbs = tl_tropo(dtot, theta, f, p, temp, press, N0, Gt, Gr );
+if (~pdr)
+
+    Lbs = tl_tropo(dtot, theta, f, p, temp, press, N0, Gt, Gr );
+
+else
+
+    % The path length expressed as the angle subtended by d km at the center of
+    % a sphere of effective Earth radius ITU-R P.2001-4 (3.5.4)
+
+    theta_e = dtot/ae; % radians
+
+    % Calculate the horizon elevation angles limited such that they are positive
+
+    theta_tpos = max(theta_t, 0);                   % Eq (3.7.11a) ITU-R P.2001-4
+    theta_rpos = max(theta_r, 0);                   % Eq (3.7.11b) ITU-R P.2001-4
+
+    [dt_cv, phi_cve, phi_cvn] = tropospheric_path(dtot, hts, hrs, theta_e, theta_tpos, theta_rpos, phir_e, phit_e, phir_n, phit_n, Re);
+
+    % height of the Earth's surface above sea level where the common volume is located
+
+    Hs = surface_altitude_cv(h, d, dt_cv)/1000.0; % in km
+
+    Ht = (htg + h(1))/1000; % in km
+    Hr = (hrg + h(end))/1000; % in km
+    
+    [Lbs, theta_s] = tl_troposcatter_pdr(f, dtot, Ht, Hr, theta_t, theta_r, phi_cvn, phi_cve, Gt, Gr, p, Hs);
+       
+end
 
 % Calculate the final transmission loss not exceeded for p% time
 
