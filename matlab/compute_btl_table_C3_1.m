@@ -213,6 +213,7 @@ for pp = 1:2 % once with and once without PDR
                 result{pp}{count}.pls = round(Lb,rd);
                 result{pp}{count}.pls_total = round(Lb,rd);
                 result{pp}{count}.delta = round(Lb - pl(it),rd);
+                result{pp}{count}.deltaf = Lb - pl(it);
                 count = count + 1;
             end
         end
@@ -265,3 +266,53 @@ for tt = 1:length(tout)
     B = [B; row];
     xlswrite(filename_out, B, page);
 end
+
+
+dd1 = cell2mat(result{1});
+dd2 = cell2mat(result{2});
+
+delta_pdr = [dd2.deltaf].';
+delta_inf = [dd1.deltaf].';
+
+pd_pdr = fitdist(delta_pdr, 'normal');
+pd_inf = fitdist(delta_inf, 'normal');
+
+figure
+
+histogram(delta_inf, 'Normalization', 'pdf', 'FaceColor', [1, 1, 0]);
+hold on
+x = [-50:1:80];
+line(x,pdf(pd_inf,x),'LineStyle','-','Color','b');
+lstr1 = ['N(' num2str(pd_inf.mu) ', ' num2str(pd_inf.sigma) ')' ];
+
+grid on
+
+histogram(delta_pdr, 'Normalization', 'pdf', 'FaceColor', [1, 0.7, 0]);
+hold on
+x = [-50:1:80];
+line(x,pdf(pd_pdr,x),'LineStyle','-.','Color','r');
+lstr2 = ['N(' num2str(pd_pdr.mu) ', ' num2str(pd_pdr.sigma) ')' ];
+legend('P.452-17', lstr1, 'PDR P.452-17', lstr2)
+xlabel('PE (dB)')
+ylabel('n.u.')
+grid on
+
+
+LL1 = cell2mat(result{1});
+LL2 = cell2mat(result{2});
+
+L_pdr = [LL2.pls_total].';
+L_inf = [LL1.pls_total].';
+L_m =   [LL1.plm].';
+
+figure
+plot(L_m, L_pdr,'b.')
+hold on
+plot(L_m, L_inf, 'ro');
+plot(L_m, L_m, 'k')
+xlabel('Lb measured (dB)')
+ylabel('Lb simulated (dB)')
+legend('PDR P.452-17', 'P.452-17','measurements', 'Location','southeast')
+grid on
+
+
