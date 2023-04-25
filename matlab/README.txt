@@ -1,4 +1,4 @@
-P452 Version 17.0 (22.05.22)
+P452 Version 17.1 (25.04.23)
 
 GENERAL NOTES
 ----------------
@@ -33,6 +33,10 @@ All the scripts (except for the Graphical User Interface) work in Octave (versio
 
 UPDATES AND FIXES
 -----------------
+Version 17.1 (25.04.23)
+    - Corrected an indexing issue in path_fraction.m and longest_cont_dist.m
+    - Corrected various issues in pw2p.m
+
 Version 17.0 (22.05.22)
     - Renamed subfolder "src" into "private" which is automatically in the MATLAB search path
     - Modified the starting point in P452.m when computing transmission loss vs distance to make sure there are at least three points 
