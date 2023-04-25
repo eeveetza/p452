@@ -23,24 +23,25 @@ if (d_tcv > d(end) || d_tcv < 0)
     error('Horizontal distance of the common volume to the transmitter must be within  [0, d(end)]');
 end
 
-k1 = find( d<= d_tcv);
-i1 = k1(end);
+[~,ii] = min(abs(d-d_tcv));
 
-k2 = find(d >= d_tcv);
-i2 = k2(1);
+if(d(ii) == d_tcv)
+    i1 = ii;
+    hs = h(i1);
+    return
+end
+
+if d(ii) < d_tcv
+    i1 = ii;
+    i2 = ii + 1;
+else
+    i2 = ii;
+    i1 = ii - 1;
+end
 
 % apply linear interpolation
-d1 = d(i1);
-d2 = d(i2);
-h1 = h(i1);
-h2 = h(i2);
-ds = d_tcv;
 
-if (d1 == d2)
-    hs = h1;
-else
-    hs = h1 + (h2-h1)*(ds-d1)/(d2-d1);
-end
+    hs = h(i1) + (h(i2)-h(i1))*(d_tcv-d(i1))/(d(i2)-d(i1));
 
 return
 end
