@@ -1,4 +1,4 @@
-P452 Version 17.1-tropo (25.04.23)
+P452 Version 17.2-tropo (16.08.23)
 
 GENERAL NOTES
 ----------------
@@ -33,6 +33,9 @@ All the scripts (except for the Graphical User Interface) work in Octave (versio
 
 UPDATES AND FIXES
 -----------------
+Version 17.2-troposcatter (16.08.23)
+        - Introduced the missing factor Ag and lower limits for theta and Lbs
+
 Version 17.1-troposcatter (25.04.23)
         - test version introducing troposcatter prediction method
 

@@ -61,7 +61,7 @@ function Lb = tl_p452(f, p, d, h, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n
 %     v9    24MAR22     Ivica Stevanovic, OFCOM         Introduced path center latitude as input argument (instead of Tx/Rx latitudes) 
 %     v10   15MAR23     Ivica Stevanovic, OFCOM         Introduced troposcatter prediction model according to 3M/364 Annex 2
 %     v11   25APR23     Ivica Stevanovic, OFCOM         Introduced more efficient interpolatio and aligned with the rest of the Recommendation
-
+%     v12   16AUG23     Ivica Stevanovic, OFCOM         In troposcatter model: introduced the missing factor Ag and lower limits for theta and Lbs
 % MATLAB Version 9.7.0.1190202 (R2019b) used in development of this code
 %
 % The Software is provided "AS IS" WITH NO WARRANTIES, EXPRESS OR IMPLIED, 
@@ -278,8 +278,10 @@ Lbam = Lbda + (Lminb0p - Lbda)*Fj;   % eq (63)
 if (~pdr)
 
     Lbs = tl_tropo(dtot, theta, f, p, temp, press, N0, Gt, Gr );
-
+    
 else
+
+    
 
     % The path length expressed as the angle subtended by d km at the center of
     % a sphere of effective Earth radius ITU-R P.2001-4 (3.5.4)
@@ -297,8 +299,8 @@ else
 
     Hs = surface_altitude_cv(h, d, dt_cv)/1000.0; % in km
     
-    [Lbs, theta_s] = tl_troposcatter_pdr(f, dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, Gt, Gr, p, Hs);
-       
+    [Lbs, theta_s] = tl_troposcatter_pdr(f, dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, Gt, Gr, p, Hs, press, temp);
+    Lbs = max(Lbs, Lbfsg);
 end
 
 % Calculate the final transmission loss not exceeded for p% time

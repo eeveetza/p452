@@ -1,4 +1,4 @@
-function [Lbs, theta] = tl_troposcatter_pdr(f, dt, hts, hrs, ae, the, thetat, thetar, phicvn, phicve, Gt, Gr, p, hs)
+function [Lbs, theta] = tl_troposcatter_pdr(f, dt, hts, hrs, ae, the, thetat, thetar, phicvn, phicve, Gt, Gr, p, hs, temp, press)
 %tl_troposcatter_pdr Troposcatter basic transmission loss
 %   This function computes the troposcatter basic transmission loss
 %   as defined in WP 3M Chairman's Report 3M/364 Annex 2 
@@ -37,6 +37,7 @@ function [Lbs, theta] = tl_troposcatter_pdr(f, dt, hts, hrs, ae, the, thetat, th
 %     v3    28OCT19     Ivica Stevanovic, OFCOM         Introduced proposal from China as given in Annex 8 of the Chairmans Report 3M/343-E from Montreal meeting 2018
 %     v4    15FEB23     Ivica Stevanovic, OFCOM         Introduced the updates from PDR (see WP 3M Chairman's report 2022 3M/364 Annex 2 )
 %     v5    25APR23     Ivica Stevanovic, OFCOM         Aligned with rest of Recommendation 
+%     v6    16AUG23     Ivica Stevanovic, OFCOM         Introduced the missing factor Ag and lower limits to theta and Lbs
 
 fMHz = f*1000;  % from GHz in MHz
 
@@ -56,6 +57,8 @@ N0 = get_interp2('N050',phicve,phicvn);
 % Step2: Calculate the scatter angle theta 
 
 theta = 1000*the + thetat + thetar; % mrad    (E.1)
+
+theta = max(theta, 1e-6); % Limit theta 
 
 % Step 3: Estimate the aperture-to-median coupling loss Lc (11)
 
@@ -81,7 +84,20 @@ end
 
 F = 0.18*N0*exp(-hs/hb) - 0.23*dN;   %(E.4)
 
-Lbs = F + 22.0*log10(fMHz) + 35.0*log10(theta) + 17.0*log10(dt) + Lc - Yp;    % (E.4)
+
+T = temp + 273.15; 
+
+% gaseous absorbtion derived from equation (9) using rho = 3 g/m^3 for the
+% whole path length
+
+rho = 3;
+
+% compute specific attenuation due to dry air and water vapor:
+[g_0, g_w] = p676d11_ga(f, press, rho, T);
+
+Ag = (g_0 + g_w) * dt;  %(9)
+
+Lbs = F + 22.0*log10(fMHz) + 35.0*log10(theta) + 17.0*log10(dt) + Lc + Ag - Yp;    % (E.4) with reinstated factor Ag
 
 return
 end
