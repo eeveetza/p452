@@ -199,7 +199,7 @@ for pp = 1:2 % once with and once without PDR
 
                 Lb = tl_p452(struct.f, Tpc, struct.d, struct.h, z, Htg, Hrg, Phite, Phitn, Phire, Phirn, Gtx, Grx, FlagVP, dct, dcr, press, temp, pdr);
 
-
+                fprintf(1,'Frequency: %g GHz\n', struct.f);
                 fprintf(1,'Time percentage: %g %%\n', t(it));
                 fprintf(1,'Measured basic tl: %g dB\n', pl(it));
                 fprintf(1,'Simulated basic tl: %g dB\n', Lb);
@@ -209,6 +209,7 @@ for pp = 1:2 % once with and once without PDR
 
                 result{pp}{count}.statno = stano{i}.number;
                 result{pp}{count}.t = t(it);
+                result{pp}{count}.f = struct.f;
                 result{pp}{count}.plm = round(pl(it),rd);
                 result{pp}{count}.pls = round(Lb,rd);
                 result{pp}{count}.pls_total = round(Lb,rd);
@@ -223,13 +224,13 @@ for pp = 1:2 % once with and once without PDR
 end
 filename_out = 'Results_Table_C3_1_P452.xls';
 
-fprintf(1,'%10s  %10s  %20s  %20s  %20s  %20s  %20s\n','Stat. no.', 't (%)', 'Measured PL (dB)', 'P.2001 (dB)', 'PDR (dB)', 'PE P.2001 (dB)', 'PE PDR (dB)');
+fprintf(1,'%10s  %10s  %10s  %20s  %20s  %20s  %20s  %20s\n','Stat. no.', 't (%)', 'f(GHz)', 'Measured PL (dB)', 'P.2001 (dB)', 'PDR (dB)', 'PE P.2001 (dB)', 'PE PDR (dB)');
 
 A = {'Stat. no.', 't (%)', 'Measured PL (dB)', 'P.452 (dB)', 'PDR (dB)', 'PE P.452 (dB)', 'PE PDR (dB)'};
 
 
 for kk = 1:length(result{1})
-    fprintf(1,'%10d  %10g  %20g  %20g  %20g  %20g  %20g\n', result{1}{kk}.statno, result{1}{kk}.t, result{1}{kk}.plm, result{1}{kk}.pls_total, result{2}{kk}.pls_total, result{1}{kk}.delta, result{2}{kk}.delta);
+    fprintf(1,'%10d  %10g  %10g %20g  %20g  %20g  %20g  %20g\n', result{1}{kk}.statno, result{1}{kk}.t, result{1}{kk}.f, result{1}{kk}.plm, result{1}{kk}.pls_total, result{2}{kk}.pls_total, result{1}{kk}.delta, result{2}{kk}.delta);
     
     row = {result{1}{kk}.statno, result{1}{kk}.t, result{1}{kk}.plm, result{1}{kk}.pls_total, result{2}{kk}.pls_total, result{1}{kk}.delta, result{2}{kk}.delta};
      if (abs(result{1}{kk}.delta) < discard && abs(result{2}{kk}.delta) < discard)
