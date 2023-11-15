@@ -2,7 +2,7 @@ function varargout = P452(varargin)
 %P452 M-file for P452.fig
 %      This is a GUI for the function tl_p452.m that computes the basic 
 %      transmission loss not exceeded for p% of time as defined in 
-%      ITU-R P.452-17.
+%      ITU-R P.452-18.
 %
 %      P452, by itself, creates a new P452 or raises the existing
 %      singleton*.
@@ -35,9 +35,10 @@ function varargout = P452(varargin)
 %                                              between clutter at the Tx and Rx sides 
 % v5    08OCT21     Ivica Stevanovic, OFCOM    Ensured that series is a row vector in find_intervals.m 
 % v6    24MAR22     Ivica Stevanovic, OFCOM    Introduced path center latitude as input argument instead of Tx/Rx latitudes
+% v7    15NOV23     Ivica Stevanovic, OFCOM    Aligned with ITU-R P.452-18
 % 
 
-% MATLAB Version 8.3.0.532 (R2014a) used in development of this code
+% MATLAB Version 9.12.0.1975300 (R2022a) Update 3 used in development of this code
 %
 % THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 % EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -55,7 +56,7 @@ function varargout = P452(varargin)
 %
 % Edit the above text to modify the response to help P452
 
-% Last Modified by GUIDE v2.5 06-Apr-2016 14:09:38
+% Last Modified by GUIDE v2.5 18-Jul-2023 09:55:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -93,6 +94,8 @@ handles.output = hObject;
 handles.p452 = [];
 handles.p452.path.d = [];
 handles.p452.path.h = [];
+handles.p452.path.r = [];
+handles.p452.path.g = [];
 handles.p452.path.zone = [];
 
 handles.p452.filename={};
@@ -101,27 +104,23 @@ handles.p452.pathname={};
 handles.p452.dtot = [];
 handles.p452.f = [];
 handles.p452.p = [];
-handles.p452.phi_t = [];
-% handles.p452.ksi_t = [];
+
 handles.p452.htg = [];
 handles.p452.Gt = [];
+handles.p452.phit_e = [];
+handles.p452.phit_n = [];
 
-% handles.p452.phi_r = [];
-% handles.p452.ksi_r = [];
 handles.p452.hrg = [];
 handles.p452.Gr = [];
+handles.p452.phir_e = [];
+handles.p452.phir_n = [];
 
 handles.p452.DN = [];
 handles.p452.N0 = [];
 handles.p452.press = [];
 handles.p452.temp = [];
 
-handles.p452.TxClutterCategory = 1;
-handles.p452.RxClutterCategory = 1;
-handles.p452.ha_t = [];
-handles.p452.dk_t = [];
-handles.p452.ha_r = [];
-handles.p452.dk_r = [];
+
 
 handles.p452.dct = 500;
 handles.p452.dcr = 500;
@@ -166,8 +165,7 @@ d1{6,1} = 'Ldsph';
 d1{7,1} = 'Ld';
 d1{8,1} = 'Lbs';
 d1{9,1} = 'Lba';
-d1{10,1} = 'Aht';
-d1{11,1} = 'Ahr';
+
 
 
 set(handles.tableLoss,'Data',d1);
@@ -268,29 +266,24 @@ function PerformAnalysis_Callback(hObject, eventdata, handles)
 if checkInput(hObject, eventdata, handles)
     
     try
+        % Apply the condition in Step 4: Radio profile
+        % gi is the terrain height in metres above sea level for all the points at a distance from transmitter or receiver less than 50 m.
+
+        kk = find(handles.p452.path.d < 50/1000);
+        if (~isempty(kk))
+            handles.p452.path.g(kk) = handles.p452.path.h(kk);
+        end
+
+        kk = find(handles.p452.path.d(end)-handles.p452.path.d < 50/1000);
+        if (~isempty(kk))
+            handles.p452.path.g(kk) = handles.p452.path.h(kk);
+        end
+
+        dc = handles.p452.path.d;
+        hc = handles.p452.path.h;
+        htgc = handles.p452.htg;
+        hrgc = handles.p452.hrg;
         
-        % Modify the path according to Section 4.5.4, Step 1
-        % and compute clutter losses
-        
-        [dc, hc, zonec, htgc, hrgc, Aht, Ahr] = closs_corr(handles.p452.f, ...
-            handles.p452.path.d, ...
-            handles.p452.path.h, ...
-            handles.p452.path.zone, ...
-            handles.p452.htg, ...
-            handles.p452.hrg, ...
-            handles.p452.ha_t, ...
-            handles.p452.ha_r, ...
-            handles.p452.dk_t, ...
-            handles.p452.dk_r);
-        
-        
-        
-        %% Body of function
-        
-        % Path center latitude
-        % great circle calculation according to P.2001 Annex H maybe more appropriate for longer paths
-        % phi_path = (handles.p452.phi_t + handles.p452.phi_r)/2;
-        phi_path = handles.p452.phi_t;
         % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
         zone_r = 12;
         
@@ -300,10 +293,39 @@ if checkInput(hObject, eventdata, handles)
         zone_r = 2;
         
         dlm = longest_cont_dist(handles.p452.path.d, handles.p452.path.zone, zone_r);
+
+        %Tx position is fixed at (handles.p452.phit_e, handles.p452.phit_n)
+        %Rx position is determined by the distance handles.p452.path.d(end)
+        %and the direction given by 
+        % (handles.p452.phit_e, handles.p452.phit_n) --> (handles.p452.phir_e, handles.p452.phir_n)
+
+        % compute great circle path between phir_e,phir_n and phit_e,phit_n
+        Re = 6371;
+        dpnt = 0;
+        [~, ~, ~, dgc] = great_circle_path(handles.p452.phir_e, handles.p452.phit_e, handles.p452.phir_n, handles.p452.phit_n, Re, dpnt);
         
+        dpnt = dc(end);
+        % compute the latitude and longitude at the end of the path of
+        % length d(end) along the great circle path (phit_e,phit_n)-->(phir_e,phir_n)
+
+        [phir_e, phir_n, ~, dgc] = great_circle_path(handles.p452.phir_e, handles.p452.phit_e, handles.p452.phir_n, handles.p452.phit_n, Re, dpnt);
+   
+
+        % Calculate the longitude and latitude of the mid-point of the path, phim_e,
+        % and phim_n for dpnt = 0.5dt
+        Re = 6371;
+        dpnt = 0.5*(handles.p452.path.d(end)-handles.p452.path.d(1));
+        [phim_e, phim_n, bt2r, dgc] = great_circle_path(phir_e, handles.p452.phit_e, phir_n, handles.p452.phit_n, Re, dpnt);
+
+        % Find radio-refractivity lapse rate dN
+        % using the digital maps at phim_e (lon), phim_n (lat) - as a bilinear interpolation
+
+        handles.p452.DN = get_interp2('DN50',phim_e,phim_n);
+        handles.p452.N0 = get_interp2('N050',phim_e,phim_n);
+
         % Compute b0
-        b0 = beta0(phi_path, dtm, dlm);
-        
+        b0 = beta0(phim_n, dtm, dlm);
+
         [ae, ab] = earth_rad_eff(handles.p452.DN);
         
         [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(dc, hc, htgc, hrgc, ae, handles.p452.f);
@@ -317,9 +339,11 @@ if checkInput(hObject, eventdata, handles)
         % Compute the path fraction over see
         
         omega = path_fraction(handles.p452.path.d, handles.p452.path.zone, 3);
-        
+                
         d = get(handles.profileParameters,'Data');
         
+       
+
         if (~isempty(handles.p452.filename))
             d{1,2} = handles.p452.filename;
         else
@@ -354,6 +378,8 @@ if checkInput(hObject, eventdata, handles)
         
         set(handles.profileParameters,'Data',d);
         handles.p452.profileParameters = d;
+
+       
         
         % modified with 3-D path for free-space computation
 
@@ -369,16 +395,36 @@ if checkInput(hObject, eventdata, handles)
             handles.p452.press,...
             dlt, ...
             dlr);
+
+       
+%         % The path length expressed as the angle subtended by d km at the center of
+%         % a sphere of effective Earth radius ITU-R P.2001-4 (3.5.4)
+% 
+%         theta_e = dtot/ae; % radians
+% 
+%         % Calculate the horizon elevation angles limited such that they are positive
+% 
+%         theta_tpos = max(theta_t, 0);                   % Eq (3.7.11a) ITU-R P.2001-5
+%         theta_rpos = max(theta_r, 0);                   % Eq (3.7.11b) ITU-R P.2001-5
+% 
+%         [dt_cv, phi_cve, phi_cvn] = tropospheric_path(dtot, hts, hrs, theta_e, theta_tpos, theta_rpos, phir_e, handles.p452.phit_e, phir_n, handles.p452.phit_n, Re);
+%         
+%         % height of the Earth's surface above sea level where the common volume is located
+% 
+%         Hs = surface_altitude_cv(hc, dc, dt_cv)/1000.0; % in km
+%         
+%         [Lbs, theta_s] = tl_troposcatter(handles.p452.f, dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, handles.p452.Gt, handles.p452.Gr, handles.p452.p, Hs);
+%         
+%         % To avoid under-estimating troposcatter for short paths, limit Lbs (E.17 in ITU-R P.2001-5)
+%         % This is included in P.2001-5 but not in P.1812 or P.452
+%         % w/o this limit, Lbs can even be negative for short paths
+%         % that is why this limit is necessary
+%         Lbs = max(Lbs, Lbfsg);
+
+        % Calculate the basic transmission loss due to troposcatter not exceeded
+        % for any time percantage p 
         
-        Lbs = tl_tropo(dtot, ...
-            theta, ...
-            handles.p452.f, ...
-            handles.p452.p, ...
-            handles.p452.temp, ...
-            handles.p452.press, ...
-            handles.p452.N0, ...
-            handles.p452.Gt, ...
-            handles.p452.Gr );
+        Lbs = tl_tropo(dtot, theta, handles.p452.f, handles.p452.p, handles.p452.temp, handles.p452.press, handles.p452.N0, handles.p452.Gt, handles.p452.Gr );
         
         
         Lba = tl_anomalous(dtot, ...
@@ -402,7 +448,7 @@ if checkInput(hObject, eventdata, handles)
             ae, ...
             b0);
         
-        Lbulla = dl_bull(dc, hc, hts, hrs, ae, handles.p452.f);
+        Lbulla = dl_bull(handles.p452.path.d, handles.p452.path.g, hts, hrs, ae, handles.p452.f);
         
         % Use the method in 4.2.1 for a second time, with all profile heights hi
         % set to zero and modified antenna heights given by
@@ -424,7 +470,7 @@ if checkInput(hObject, eventdata, handles)
         
         Ldsph = dl_se(dtot, hte, hre, ae, handles.p452.f, omega);
         
-        % Diffraction loss for the general paht is now given by
+        % Diffraction loss for the general path is now given by
         
         Ld(1) = Lbulla + max(Ldsph(1) - Lbulls, 0);  % eq (40)
         Ld(2) = Lbulla + max(Ldsph(2) - Lbulls, 0);  % eq (40)%%
@@ -433,23 +479,21 @@ if checkInput(hObject, eventdata, handles)
             handles.p452.p, ...
             handles.p452.path.d, ...
             handles.p452.path.h, ...
+            handles.p452.path.g, ...
             handles.p452.path.zone, ...
             handles.p452.htg, ...
             handles.p452.hrg, ...
-            handles.p452.phi_t,...
+            handles.p452.phit_e,...
+            handles.p452.phit_n,...
+            phir_e,...
+            phir_n,...
             handles.p452.Gt, ...
             handles.p452.Gr, ...
             handles.p452.polarization, ...
             handles.p452.dct, ...
             handles.p452.dcr, ...
-            handles.p452.DN, ...
-            handles.p452.N0, ...
             handles.p452.press, ...
-            handles.p452.temp, ...
-            handles.p452.ha_t, ...
-            handles.p452.ha_r, ...
-            handles.p452.dk_t, ...
-            handles.p452.dk_r);
+            handles.p452.temp);
         
         d1 = get(handles.tableLoss,'Data');
         
@@ -464,8 +508,7 @@ if checkInput(hObject, eventdata, handles)
         d1{7,2} = sprintf(format,Ld(pol));
         d1{8,2} = sprintf(format,Lbs);
         d1{9,2} = sprintf(format,Lba);
-        d1{10,2} = sprintf(format,Aht);
-        d1{11,2} = sprintf(format,Ahr);
+
         
         set(handles.tableLoss,'Data',d1);
         handles.p452.tableLoss = d1;
@@ -543,35 +586,51 @@ elseif userChoiceInt ==3 %as a function of power density
     if ~checkInput(hObject, eventdata, handles)
         return
     end
+
+    % Tx position is at phit_e,phit_n
+    % Rx position will be along great circle path in the direction
+    % phir_e,phir_n
     
+    % compute great circle path between phir_e,phir_n and phit_e,phit_n
+    Re = 6371;
+    dpnt = 0;
+    [~, ~, ~, dgc] = great_circle_path(handles.p452.phir_e, handles.p452.phit_e, handles.p452.phir_n, handles.p452.phit_n, Re, dpnt);
+
+
     count = 0;
     for ii = 6:length(handles.p452.path.d)
         d = handles.p452.path.d(1:ii);
         h = handles.p452.path.h(1:ii);
+        g = handles.p452.path.g(1:ii);
         zone = handles.p452.path.zone(1:ii);
         
-        %if (handles.p452.dk_t + handles.p452.dk_r < 10*(d(end)-d(1)))
+        dpnt = d(end);
+        % compute the latitude and longitude at the end of the path of
+        % length d(end) along the great circle path (phit_e,phit_n)-->(phir_e,phir_n)
+
+        [phim_e, phim_n, ~, dgc] = great_circle_path(handles.p452.phir_e, handles.p452.phit_e, handles.p452.phir_n, handles.p452.phit_n, Re, dpnt);
+   
+
+
             Lb = tl_p452(   handles.p452.f, ...
                 handles.p452.p, ...
                 d, ...
                 h, ...
+                g, ...
                 zone, ...
                 handles.p452.htg, ...
                 handles.p452.hrg, ...
-                handles.p452.phi_t,...
+                handles.p452.phit_e,...
+                handles.p452.phit_n,...
+                phim_e,...
+                phim_n,...
                 handles.p452.Gt, ...
                 handles.p452.Gr, ...
                 handles.p452.polarization, ...
                 handles.p452.dct, ...
                 handles.p452.dcr, ...
-                handles.p452.DN, ...
-                handles.p452.N0, ...
                 handles.p452.press, ...
-                handles.p452.temp, ...
-                handles.p452.ha_t, ...
-                handles.p452.ha_r, ...
-                handles.p452.dk_t, ...
-                handles.p452.dk_r);
+                handles.p452.temp);
             count = count + 1;
             xx(count) = d(end)-d(1);
             yy(count) = Lb;
@@ -621,7 +680,7 @@ end
 % %        str2double(get(hObject,'String')) returns contents of ksi_t as a double
 % in = str2double(get(hObject, 'String'));
 % if (isnan(in))
-%     warndlg({'Tx Longitude must be a number.'});
+%     warndlg({'Tx tx_longitude must be a number.'});
 %     set(hObject,'Foregroundcolor',[1 0 0]);
 %     % elseif (in <=0)
 %     %     warndlg({'Height must be a positive number.'});
@@ -659,7 +718,7 @@ end
 % %        str2double(get(hObject,'String')) returns contents of ksi_r as a double
 % in = str2double(get(hObject, 'String'));
 % if (isnan(in))
-%     warndlg({'Rx Longitude must be a number.'});
+%     warndlg({'Rx tx_longitude must be a number.'});
 %     set(hObject,'Foregroundcolor',[1 0 0]);
 %     % elseif (in <=0)
 %     %     warndlg({'Height must be a positive number.'});
@@ -800,79 +859,6 @@ end
 
 
 
-function phi_t_Callback(hObject, eventdata, handles)
-% hObject    handle to phi_t (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of phi_t as text
-%        str2double(get(hObject,'String')) returns contents of phi_t as a double
-
-in = str2double(get(hObject, 'String'));
-if (isnan(in))
-    warndlg({'Path center Latitude must be a number.'});
-    set(hObject,'Foregroundcolor',[1 0 0]);
-    % elseif (in <=0)
-    %     warndlg({'Height must be a positive number.'});
-    %     set(hObject,'Foregroundcolor',[1 0 0]);
-else
-    set(hObject,'Foregroundcolor',[0 0 0]);
-end
-handles.p452.phi_t = in;
-handles.p452.ParameterChange = true;
-%Update handles structure
-guidata(hObject, handles);
-
-% --- Executes during object creation, after setting all properties.
-function phi_t_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to phi_t (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-% function phi_r_Callback(hObject, eventdata, handles)
-% % hObject    handle to phi_r (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hints: get(hObject,'String') returns contents of phi_r as text
-% %        str2double(get(hObject,'String')) returns contents of phi_r as a double
-% 
-% in = str2double(get(hObject, 'String'));
-% if (isnan(in))
-%     warndlg({'Rx Latitude must be a number.'});
-%     set(hObject,'Foregroundcolor',[1 0 0]);
-%     % elseif (in <=0)
-%     %     warndlg({'Height must be a positive number.'});
-%     %     set(hObject,'Foregroundcolor',[1 0 0]);
-% else
-%     set(hObject,'Foregroundcolor',[0 0 0]);
-% end
-% handles.p452.phi_r = in;
-% handles.p452.ParameterChange = true;
-% %Update handles structure
-% guidata(hObject, handles);
-
-
-% % --- Executes during object creation, after setting all properties.
-% function phi_r_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to phi_r (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: edit controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
-% end
-
 
 function alldefined=checkInput(hObject, eventdata, handles)
 
@@ -923,29 +909,30 @@ if (sum(get(handles.p,'Foregroundcolor')) ~= 0)
     return
 end
 
-if (sum(get(handles.phi_t,'Foregroundcolor')) ~= 0)
-    warndlg({'Check input parameters: Path Center Latitude.'},'Error','modal');
+if (sum(get(handles.phit_e,'Foregroundcolor')) ~= 0)
+    warndlg({'Check input parameters: Tx Longitude.'},'Error','modal');
     alldefined=false;
     return
 end
 
-% if (sum(get(handles.phi_r,'Foregroundcolor')) ~= 0)
-%     warndlg({'Check input parameters: Rx Latitude.'},'Error','modal');
-%     alldefined=false;
-%     return
-% end
-% 
-% if (sum(get(handles.ksi_t,'Foregroundcolor')) ~= 0)
-%     warndlg({'Check input parameters: Tx Longitude.'},'Error','modal');
-%     alldefined=false;
-%     return
-% end
-% 
-% if (sum(get(handles.ksi_r,'Foregroundcolor')) ~= 0)
-%     warndlg({'Check input parameters: Rx Longitude.'},'Error','modal');
-%     alldefined=false;
-%     return
-% end
+if (sum(get(handles.phit_n,'Foregroundcolor')) ~= 0)
+    warndlg({'Check input parameters: Tx Latitude.'},'Error','modal');
+    alldefined=false;
+    return
+end
+
+
+if (sum(get(handles.phir_e,'Foregroundcolor')) ~= 0)
+    warndlg({'Check input parameters: Rx Longitude.'},'Error','modal');
+    alldefined=false;
+    return
+end
+
+if (sum(get(handles.phir_n,'Foregroundcolor')) ~= 0)
+    warndlg({'Check input parameters: Rx Latitude.'},'Error','modal');
+    alldefined=false;
+    return
+end
 
 
 if (sum(get(handles.htg,'Foregroundcolor')) ~= 0)
@@ -975,20 +962,6 @@ end
 
 
 
-if (sum(get(handles.DN,'Foregroundcolor')) ~= 0)
-    warndlg({'Check input parameter: DN.'},'Error','modal');
-    alldefined=false;
-    return
-end
-
-
-if (sum(get(handles.N0,'Foregroundcolor')) ~= 0)
-    warndlg({'Check input parameter: N0.'},'Error','modal');
-    alldefined=false;
-    return
-end
-
-
 if (sum(get(handles.press,'Foregroundcolor')) ~= 0)
     warndlg({'Check input parameter: Pressure.'},'Error','modal');
     alldefined=false;
@@ -1016,17 +989,29 @@ if (sum(get(handles.dcr,'Foregroundcolor')) ~= 0)
     return
 end
 
+phir_n = str2double(get(handles.phir_n, 'String'));
+phir_e = str2double(get(handles.phir_e, 'String'));
+phit_n = str2double(get(handles.phit_n, 'String'));
+phit_e = str2double(get(handles.phit_e, 'String'));
+
+if (phit_e==phir_e && phit_n == phir_n)
+    warndlg({'Tx and Rx stations cannot be at the same point.'},'Error','modal');
+    alldefined=false;
+    return
+end
 
 
 if (isempty(handles.p452.f) || ...
         isempty(handles.p452.p) || ...
         isempty(handles.p452.polarization) || ...
-        isempty(handles.p452.phi_t) || ...
+        isempty(handles.p452.phit_e) || ...
+        isempty(handles.p452.phit_n) || ...
+        isempty(handles.p452.phir_e) || ...
+        isempty(handles.p452.phir_n) || ...
         isempty(handles.p452.htg) || ...
         isempty(handles.p452.hrg) || ...
         isempty(handles.p452.Gt) || ...
         isempty(handles.p452.Gr) || ...
-        isempty(handles.p452.DN) || ...
         isempty(handles.p452.press) || ...
         isempty(handles.p452.temp) || ...
         isempty(handles.p452.dct) || ...
@@ -1038,12 +1023,6 @@ if (isempty(handles.p452.f) || ...
    
 end
 
-
- if handles.p452.N0 <= handles.p452.DN
-        warndlg({'Parameter N0 should be larger than DN.'},'Error','modal');
-        alldefined = false;
-        return
- end
 
 alldefined = true;
 return
@@ -1089,21 +1068,17 @@ set(handles.ChoosePolarization, 'Value', handles.p452.polarization+1);
 
 set(handles.f, 'String', num2str(handles.p452.f));
 set(handles.p, 'String', num2str(handles.p452.p));
-set(handles.phi_t, 'String', num2str(handles.p452.phi_t));
-% set(handles.phi_r, 'String', num2str(handles.p452.phi_r));
-% set(handles.ksi_t, 'String', num2str(handles.p452.ksi_t));
-% set(handles.ksi_r, 'String', num2str(handles.p452.ksi_r));
+set(handles.phit_e, 'String', num2str(handles.p452.phit_e));
+set(handles.phit_n, 'String', num2str(handles.p452.phit_n));
+set(handles.phir_e, 'String', num2str(handles.p452.phir_e));
+set(handles.phir_n, 'String', num2str(handles.p452.phir_n));
 set(handles.htg, 'String', num2str(handles.p452.htg));
 set(handles.hrg, 'String', num2str(handles.p452.hrg));
 set(handles.Gt, 'String', num2str(handles.p452.Gt));
 set(handles.Gr, 'String', num2str(handles.p452.Gr));
-set(handles.DN, 'String', num2str(handles.p452.DN));
-set(handles.N0, 'String', num2str(handles.p452.N0));
 set(handles.press, 'String', num2str(handles.p452.press));
 set(handles.temp, 'String', num2str(handles.p452.temp));
 
-set(handles.TxClutterCategory, 'Value', handles.p452.TxClutterCategory);
-set(handles.RxClutterCategory, 'Value', handles.p452.RxClutterCategory);
 
 set(handles.dct, 'String', num2str(handles.p452.dct));
 set(handles.dcr, 'String', num2str(handles.p452.dcr));
@@ -1196,30 +1171,71 @@ end
 face_alpha = 0.7;
 xx = handles.p452.path.d;
 yy = handles.p452.path.h;
+zz = handles.p452.path.g;
 
 axes(ax);
 
 kk = find(handles.p452.path.zone == 1);
 xx1 = xx(kk);
 yy1 = yy(kk);
+zz1 = zz(kk);
 
 
 kk = find(handles.p452.path.zone == 2);
 xx2 = xx(kk);
 yy2 = yy(kk);
+zz2 = zz(kk);
 
 kk = find(handles.p452.path.zone == 3);
 xx3 = xx(kk);
 yy3 = yy(kk);
+zz3 = zz(kk);
 
-h1=plot(ax,xx, yy, 'LineWidth', 1);
+h1=plot(ax,xx, yy);
 set(h1,'Color', 'k','LineWidth',2) % , 'Marker', markers{kk},'MarkerFaceColor', colors{kk})
-hold(ax, 'on');
 
+xlabel(ax,'Distance (km)');
+ylabel(ax,'Height (m)')
+grid(ax, 'on');
+hold(ax, 'on');
+set(ax, 'XLim', [xx(1) xx(end)]);
+
+bits = (yy == zz);
+df = diff(bits);
+k1 = find(df == -1);
+if(~isempty(k1))
+    for idx = 1:length(k1)
+        p = k1(idx);
+        xx = insert(xx, p+1, xx(p));
+        zz = insert(zz, p+1, zz(p+1));
+    end
+end
+
+k2 = find(df == 1);
+
+if(~isempty(k2))
+    for idx = 1:length(k2)
+        p = k2(idx);
+        xx = insert(xx, p+1, xx(p+1));
+        zz = insert(zz, p+2, yy(p));
+    end
+end
+
+h2 = plot(ax,xx,zz);
+legend(ax,'Terrain profile', 'Clutter profile')
+hold(ax, 'off');
+guidata(hObject, handles);
+
+
+% warning off
+% pgon = polyshape([xx, xx(end:-1:1)], [yy, zz(end:-1:1)], 'Simplify', true);
+% warning on
+% 
+% h3 = plot(ax,pgon);
 
 % h1=plot(ax,xx1, yy1, 'LineWidth', 1);
 % set(h1,'Color', 'k','LineWidth',2) % , 'Marker', markers{kk},'MarkerFaceColor', colors{kk})
-% hold(ax, 'on');
+% 
 % 
 % h2=plot(ax,xx2, yy2, 'LineWidth', 1);
 % set(h2,'Color', 'b','LineWidth',2) % , 'Marker', markers{kk},'MarkerFaceColor', colors{kk})
@@ -1229,13 +1245,7 @@ hold(ax, 'on');
 % set(h2,'Color', 'g','LineWidth',2) % , 'Marker', markers{kk},'MarkerFaceColor', colors{kk})
 % hold(ax, 'on');
 
-xlabel(ax,'Distance (km)');
-ylabel(ax,'Height (m)')
-grid(ax, 'on');
-hold(ax, 'on');
-set(ax, 'XLim', [xx(1) xx(end)]);
-guidata(hObject, handles);
-hold(ax, 'off');
+
 
 
 function out = readinputfield(hObject, varargin)
@@ -1317,29 +1327,27 @@ set(handles.dtot,'Enable','on');
 
 set(handles.f, 'String', '');
 set(handles.p, 'String', '');
-set(handles.phi_t, 'String', '');
-% set(handles.phi_r, 'String', '');
-% set(handles.ksi_t, 'String', '');
-% set(handles.ksi_r, 'String', '');
 set(handles.htg, 'String', '');
 set(handles.hrg, 'String', '');
 set(handles.Gt, 'String', '');
 set(handles.Gr, 'String', '');
-set(handles.DN, 'String', '');
-set(handles.N0, 'String', '');
+set(handles.phit_e, 'String', '');
+set(handles.phir_e, 'String', '');
+set(handles.phit_n, 'String', '');
+set(handles.phir_n, 'String', '');
 set(handles.press, 'String', '');
 set(handles.temp, 'String', '');
 set(handles.ChoosePolarization, 'Value', 1);
-set(handles.TxClutterCategory,'Value',1);
-set(handles.RxClutterCategory,'Value',1);
 set(handles.dct,'String','500');
-set(handles.dct,'String','500');
+set(handles.dcr,'String','500');
 
 set(handles.basicTL, 'String', '');
 
 handles.p452 = [];
 handles.p452.path.d = [];
 handles.p452.path.h = [];
+handles.p452.path.g = [];
+handles.p452.path.r = [];
 handles.p452.path.zone = [];
 
 handles.p452.filename={};
@@ -1348,7 +1356,10 @@ handles.p452.pathname={};
 handles.p452.dtot = [];
 handles.p452.f = [];
 handles.p452.p = [];
-handles.p452.phi_t = [];
+handles.p452.phit_e = [];
+handles.p452.phit_n = [];
+handles.p452.phir_e = [];
+handles.p452.phir_n = [];
 % handles.p452.ksi_t = [];
 handles.p452.htg = [];
 handles.p452.Gt = [];
@@ -1362,13 +1373,6 @@ handles.p452.DN = [];
 handles.p452.N0 = [];
 handles.p452.press = [];
 handles.p452.temp = [];
-
-handles.p452.TxClutterCategory = 1;
-handles.p452.RxClutterCategory = 1;
-handles.p452.ha_t = [];
-handles.p452.dk_t = [];
-handles.p452.ha_r = [];
-handles.p452.dk_r = [];
 
 handles.p452.dct = 500;
 handles.p452.dcr = 500;
@@ -1412,8 +1416,7 @@ d1{6,1} = 'Ldsph';
 d1{7,1} = 'Ld';
 d1{8,1} = 'Lbs';
 d1{9,1} = 'Lba';
-d1{10,1} = 'Aht';
-d1{11,1} = 'Ahr';
+
 
 
 set(handles.tableLoss,'Data',d1);
@@ -1448,14 +1451,17 @@ function LoadProfile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 [filename, pathname] = uigetfile( ...
-    {'*.dat', 'Data files'; ...
-    '*.*',  'All Files (*.*)'}, ...
+    { ...
+    '*.dat;*.csv;*.txt', 'Data files (*.dat,*.csv,*.txt)'; ...
+       '*.*',  'All Files (*.*)'}, ...
     'Pick a file');
 
 if (filename==0)
     
     handles.p452.path.d = [];
     handles.p452.path.h = [];
+    handles.p452.path.r = [];
+    handles.p452.path.g = [];
     handles.p452.path.zone = [];
     
     handles.p452.filename=[];
@@ -1469,52 +1475,64 @@ if (filename==0)
 end
 
 handles.p452.filename=filename;
+
 handles.p452.pathname=pathname;
 
+
 try
-    a = load([pathname '\' filename]);
+
+    a = load([pathname filename]);
     handles.p452.path.d = a(:, 1);
     handles.p452.path.h = a(:, 2);
+    handles.p452.path.r = a(:, 3);
+    handles.p452.path.g = a(:,2) + a(:,3);
     [m,n]= size(a);
-    if n == 3
+    if n == 4
         handles.p452.path.zone  = a(:, 3);
     else
         handles.p452.path.zone = ones(m,1)*2;
     end
+    plotSemaphores(hObject, eventdata, handles)
     
 catch
     
     try
-        
-        fid = fopen([pathname '\' filename]);
+        %disp('trying with strings')
+        fid = fopen([pathname filename]);
         kk = 0;
         while(1)
-            kk = kk + 1;
+           
             readLine = fgetl(fid);
             if (readLine==-1)
                 break
             end
-            
-            dummy=strsplit(readLine);
-            d(kk) = str2double(dummy{1});
-            h(kk) = str2double(dummy{2});
-            
-            if strcmp(dummy{3},'A1')
-                zone(kk)=1;
-            elseif strcmp(dummy{3},'A2')
-                zone(kk)=2;
-            elseif strcmp(dummy{3},'B')
-                zone(kk)=3;
+
+            if contains(readLine, 'Ground') % skip headers
+                continue;
+            end
+
+            % check if it is comma separated or tab separated file
+            if contains(readLine, ',')
+
+                dummy = strsplit(readLine,',');
             else
-                zone(kk)=[];
+                dummy = strsplit(readLine);
             end
             
+            kk = kk + 1;
+            d(kk) = str2double(dummy{1});
+            h(kk) = str2double(dummy{2});
+            r(kk) = str2double(dummy{3});
+            zone(kk) = str2double(dummy{5});
             
         end
         fclose(fid);
         handles.p452.path.d = d;
         handles.p452.path.h = h;
+        handles.p452.path.r = r;
+        handles.p452.path.g = h + r;
         handles.p452.path.zone = zone;
+        plotSemaphores(hObject, eventdata, handles)
         guidata(hObject, handles);
     catch
         
@@ -2045,6 +2063,8 @@ if N < 100
 end
 handles.p452.path.d = linspace(0,in,N).';
 handles.p452.path.h = zeros(N,1);
+handles.p452.path.r = zeros(N,1);
+handles.p452.path.g = zeros(N,1);
 handles.p452.path.zone = 2*ones(N,1);
 
 handles.p452.ParameterChange = true;
@@ -2084,6 +2104,8 @@ else
     set(handles.LoadProfile,'Enable','off');
     handles.p452.path.d = [];
     handles.p452.path.h = [];
+    handles.p452.path.r = [];
+    handles.p452.path.g = [];
     handles.p452.path.zone = [];
     handles.p452.filename = {};
 end
@@ -2159,7 +2181,7 @@ function About_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 msg =  {'- This program computes the basic transmission loss according to'; ...
-        '  ITU-R P.452-17.'; ' ';...
+        '  ITU-R P.452-18.'; ' ';...
 '- The main implementation of the recommendation is MATLAB function'; ...
 '  tl_p452.m placed in this folder that can be used independently'; ...
 '  of this Graphical User Interface but needs the functions '; ...
@@ -2167,7 +2189,7 @@ msg =  {'- This program computes the basic transmission loss according to'; ...
 '- Hydrometeor-scatter prediction is not implemented in this version.'; ' ';...
 '- Test functions to verify/validate the current implementation are placed'; ...
 '  in ./private folder.'; ' '; ...
-'- v2.25.11.16,  Ivica Stevanovic, OFCOM (CH)';};
+'- v3.15.11.23,  Ivica Stevanovic, OFCOM (CH)';};
 h = msgbox(msg,'About');
 
 
@@ -2186,17 +2208,17 @@ fail = 0;
 success = s;
 fail = f;
 %
-[s,f] = test_path_1();
-success = success + s;
-fail = fail + f;
-%
-[s,f] = test_path_2();
-success = success + s;
-fail = fail + f;
-%
-[s,f] = test_ClutterLoss();
-success = success + s;
-fail = fail + f;
+% [s,f] = test_path_1();
+% success = success + s;
+% fail = fail + f;
+% %
+% [s,f] = test_path_2();
+% success = success + s;
+% fail = fail + f;
+% %
+% [s,f] = test_ClutterLoss();
+% success = success + s;
+% fail = fail + f;
 
 %%
 msg = {sprintf('*** %d (out of %d) test(s) succeeded.', success, success+fail); ...
@@ -2245,3 +2267,155 @@ function RadioMaps_Callback(hObject, eventdata, handles)
 % hObject    handle to RadioMaps (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes during object creation, after setting all properties.
+function text96_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to text96 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+
+function phit_e_Callback(hObject, eventdata, handles)
+% hObject    handle to phit_e (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of phit_e as text
+%        str2double(get(hObject,'String')) returns contents of phit_e as a double
+in = str2double(get(hObject, 'String'));
+if (isnan(in))
+    warndlg({'Tx longitude value must be a number.'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+elseif (in < -180 && in > 180)
+    warndlg({'Tx longitude must be in the range [-180, 180].'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+else
+    set(hObject,'Foregroundcolor',[0 0 0]);
+end
+handles.p452.phit_e = in;
+handles.p452.ParameterChange = true;
+% Update handles structure
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function phit_e_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to phit_e (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function phit_n_Callback(hObject, eventdata, handles)
+% hObject    handle to phit_n (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of phit_n as text
+%        str2double(get(hObject,'String')) returns contents of phit_n as a double
+in = str2double(get(hObject, 'String'));
+if (isnan(in))
+    warndlg({'Tx latitude value must be a number.'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+elseif (in <= -90 && in >= 90)
+    warndlg({'Tx latitude must be in the range (-90, 90).'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+else
+    set(hObject,'Foregroundcolor',[0 0 0]);
+end
+handles.p452.phit_n = in;
+handles.p452.ParameterChange = true;
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function phit_n_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to phit_n (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function phir_n_Callback(hObject, eventdata, handles)
+% hObject    handle to phir_n (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of phir_n as text
+%        str2double(get(hObject,'String')) returns contents of phir_n as a double
+in = str2double(get(hObject, 'String'));
+if (isnan(in))
+    warndlg({'Rx latitude value must be a number.'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+elseif (in <= -90 && in >= 90)
+    warndlg({'Rx latitude must be in the range (-90, 90).'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+else
+    set(hObject,'Foregroundcolor',[0 0 0]);
+end
+handles.p452.phir_n = in;
+handles.p452.ParameterChange = true;
+% Update handles structure
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function phir_n_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to phir_n (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function phir_e_Callback(hObject, eventdata, handles)
+% hObject    handle to phir_e (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of phir_e as text
+%        str2double(get(hObject,'String')) returns contents of phir_e as a double
+in = str2double(get(hObject, 'String'));
+if (isnan(in))
+    warndlg({'Rx longitude value must be a number.'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+elseif (in < -180 && in > 180)
+    warndlg({'Rx longitude must be in the range [-180, 180].'},'Error','modal');
+    set(hObject,'Foregroundcolor',[1 0 0]);
+else
+    set(hObject,'Foregroundcolor',[0 0 0]);
+end
+handles.p452.phir_e = in;
+handles.p452.ParameterChange = true;
+% Update handles structure
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function phir_e_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to phir_e (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

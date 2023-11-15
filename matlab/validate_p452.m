@@ -9,6 +9,7 @@
 % Author: Ivica Stevanovic (IS), Federal Office of Communications, Switzerland
 % Revision History:
 % Date            Revision
+% 15NOV23         Updated to align with ITU-R P.452-18 (IS)
 % 16FEB22         Created - transliterated validation examples using .csv instead of .xlsx
 %                 Created new validate_p452.m that handles .csv files
 %                 These are meant to replace the previous version working
@@ -18,8 +19,6 @@
 %                                                       (as suggested by K. Konstantinou, Ofcom UK)
 % 05JUN2020       Introduced Octave specific code (with M. Rohner, LS telcom)
 % 16JUN2016       Initial version (IS)
-
-
 
 
 clear all;
@@ -68,14 +67,29 @@ for iname = 1 : length(filenames)
     
     p452.path.d = str2double( X(:,1) );
     p452.path.h = str2double( X(:,2) );
-    p452.path.zone = str2double( X(:,4) );
+    p452.path.r = str2double( X(:,3) );
+    p452.path.zone = str2double( X(:,5) );
     
+    p452.path.g = p452.path.h + p452.path.r;
+   
+    % Apply the condition in Step 4: Radio profile 
+    % gi is the terrain height in metres above sea level for all the points at a distance from transmitter or receiver less than 50 m.
+    
+    kk = find(p452.path.d < 50/1000);
+    if (~isempty(kk))
+        p452.path.g(kk) = p452.path.h(kk);
+    end
+    
+    kk = find(p452.path.d(end)-p452.path.d < 50/1000);
+    if (~isempty(kk))
+        p452.path.g(kk) = p452.path.h(kk);
+    end
     
     fname_part = filename1(13:end);
     test_result = ['test_result' fname_part] ;
     if(flag_createlog)
         fidlog = fopen(test_result, 'w');
-        fprintf(fidlog,'profile,f (GHz),p (%%),htg (m),hrg (m),phi_path (deg),Gt (dBi),Gr (dBi),pol (1-h/2-v),dct (km),dcr (km),DN (N-units/km),N0 (N-units),press (hPa),temp (deg C),ha_t (m),ha_r (m),dk_t (km),dk_r (km),ae,dtot,hts,hrs,theta_t,theta_r,theta,hm,hte,hre,hstd,hsrd,dlt,dlr,path,dtm,dlm,b0,omega,Lb,Lbfsg,Lb0p,Lb0b,Ldsph,Ld50,Ldp,Lbs,Lba\n');
+        fprintf(fidlog,'profile,f (GHz),p (%%),htg (m),hrg (m),phit_e (deg),phit_n (deg),phir_e (deg),phir_n (deg),Gt (dBi),Gr (dBi),pol (1-h/2-v),dct (km),dcr (km),press (hPa),temp (deg C),ae,dtot,hts,hrs,theta_t,theta_r,theta,hm,hte,hre,hstd,hsrd,dlt,dlr,path,dtm,dlm,b0,omega,DN,N0,Lb,Lbfsg,Lb0p,Lb0b,Ldsph,Ld50,Ldp,Lbs,Lba\n');
     end
     % read the input arguments and reference values
     
@@ -89,42 +103,45 @@ for iname = 1 : length(filenames)
         pp(i)    = str2double(Y(i,3));
     end
     
-    p452.htg     = str2double(Y(1,4));
-    p452.hrg     = str2double(Y(1,5));
-    p452.phi_path   = str2double(Y(1,6));
-    p452.Gt      = str2double(Y(1,7));
-    p452.Gr      = str2double(Y(1,8));
-    p452.pol     = str2double(Y(1,9));
-    p452.dct     = str2double(Y(1,10));
-    p452.dcr     = str2double(Y(1,11));
-    p452.DN      = str2double(Y(1,12));
-    p452.N0      = str2double(Y(1,13));
-    p452.press   = str2double(Y(1,14));
-    p452.temp    = str2double(Y(1,15));
-    p452.ha_t    = str2double(Y(1,16));
-    p452.ha_r    = str2double(Y(1,17));
-    p452.dk_t    = str2double(Y(1,18));
-    p452.dk_r    = str2double(Y(1,19));
+    p452.htg      = str2double(Y(1,4));
+    p452.hrg      = str2double(Y(1,5));
+    p452.phit_e   = str2double(Y(1,6));
+    p452.phit_n   = str2double(Y(1,7));
+    p452.phir_e   = str2double(Y(1,8));
+    p452.phir_n   = str2double(Y(1,9));
+
+    p452.Gt      = str2double(Y(1,10));
+    p452.Gr      = str2double(Y(1,11));
+    p452.pol     = str2double(Y(1,12));
+    p452.dct     = str2double(Y(1,13));
+    p452.dcr     = str2double(Y(1,14));
+
+
+    p452.press   = str2double(Y(1,15));
+    p452.temp    = str2double(Y(1,16));
+
     
-    ppref.ae      =  str2double(Y(1,20));
-    ppref.dtot    =  str2double(Y(1,21));
-    ppref.hts     =  str2double(Y(1,22));
-    ppref.hrs     =  str2double(Y(1,23));
-    ppref.theta_t =  str2double(Y(1,24));
-    ppref.theta_r =  str2double(Y(1,25));
-    ppref.theta   =  str2double(Y(1,26));
-    ppref.hm      =  str2double(Y(1,27));
-    ppref.hte     =  str2double(Y(1,28));
-    ppref.hre     =  str2double(Y(1,29));
-    ppref.hstd    =  str2double(Y(1,30));
-    ppref.hsrd    =  str2double(Y(1,31));
-    ppref.dlt     =  str2double(Y(1,32));
-    ppref.dlr     =  str2double(Y(1,33));
-    ppref.path    =  (Y(1,34));
-    ppref.dtm     =  str2double(Y(1,35));
-    ppref.dlm     =  str2double(Y(1,36));
-    ppref.b0      =  str2double(Y(1,37));
-    ppref.omega   =  str2double(Y(1,38));
+    ppref.ae      =  str2double(Y(1,17));
+    ppref.dtot    =  str2double(Y(1,18));
+    ppref.hts     =  str2double(Y(1,19));
+    ppref.hrs     =  str2double(Y(1,20));
+    ppref.theta_t =  str2double(Y(1,21));
+    ppref.theta_r =  str2double(Y(1,22));
+    ppref.theta   =  str2double(Y(1,23));
+    ppref.hm      =  str2double(Y(1,24));
+    ppref.hte     =  str2double(Y(1,25));
+    ppref.hre     =  str2double(Y(1,26));
+    ppref.hstd    =  str2double(Y(1,27));
+    ppref.hsrd    =  str2double(Y(1,28));
+    ppref.dlt     =  str2double(Y(1,29));
+    ppref.dlr     =  str2double(Y(1,30));
+    ppref.path    =  (Y(1,31));
+    ppref.dtm     =  str2double(Y(1,32));
+    ppref.dlm     =  str2double(Y(1,33));
+    ppref.b0      =  str2double(Y(1,34));
+    ppref.omega   =  str2double(Y(1,35));
+    ppref.DN      =  str2double(Y(1,36));
+    ppref.N0      =  str2double(Y(1,37));
     
     if strcmp(ppref.path,'Line of Sight')
         ppref.pathtype = 1;
@@ -132,11 +149,10 @@ for iname = 1 : length(filenames)
         ppref.pathtype = 2;
     end
     
-    
-    [dc, hc, zonec, htgc, hrgc, Aht, Ahr] = closs_corr(ff(1), p452.path.d, p452.path.h, p452.path.zone, p452.htg, p452.hrg, p452.ha_t, p452.ha_r, p452.dk_t, p452.dk_r);
-    
-    % Path center latitude
-    phi_path = p452.phi_path;
+    d = p452.path.d;
+    h = p452.path.h;
+    g = p452.path.g;
+    zone = p452.path.zone;
     
     % Compute  dtm     -   the longest continuous land (inland + coastal) section of the great-circle path (km)
     zone_r = 12;
@@ -145,19 +161,33 @@ for iname = 1 : length(filenames)
     % Compute  dlm     -   the longest continuous inland section of the great-circle path (km)
     zone_r = 2;
     dlm = longest_cont_dist(p452.path.d, p452.path.zone, zone_r);
-    
+
+    % Calculate the longitude and latitude of the mid-point of the path, phim_e,
+    % and phim_n for dpnt = 0.5dt
+    Re = 6371;
+    dpnt = 0.5*(d(end)-d(1));
+    [phim_e, phim_n, bt2r, dgc] = great_circle_path(p452.phir_e, p452.phit_e, p452.phir_n, p452.phit_n, Re, dpnt);
+
+
+    % Find radio-refractivity lapse rate dN
+    % using the digital maps at phim_e (lon), phim_n (lat) - as a bilinear interpolation
+
+    DN = get_interp2('DN50',phim_e,phim_n);
+    N0 = get_interp2('N050',phim_e,phim_n);
+
+
     % Compute b0
-    b0 = beta0(phi_path, dtm, dlm);
+    b0 = beta0(phim_n, dtm, dlm);
     
-    [ae, ab] = earth_rad_eff(p452.DN);
+    [ae, ab] = earth_rad_eff(DN);
     
-    [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(dc, hc, htgc, hrgc, ae, ff(1));
+    [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(d, h, p452.htg, p452.hrg, ae, ff(1));
     
-    dtot = dc(end)-dc(1);
+    dtot = d(end)-d(1);
     
     %Tx and Rx antenna heights above mean sea level amsl (m)
-    hts = hc(1) + htgc;
-    hrs = hc(end) + hrgc;
+    hts = h(1) + p452.htg;
+    hrs = h(end) + p452.hrg;
     
     % Compute the path fraction over see
     
@@ -182,7 +212,9 @@ for iname = 1 : length(filenames)
     out.dlm = dlm;
     out.b0 = b0;
     out.omega = omega;
-    
+    out.DN = DN;
+    out.N0 = N0;
+
     %% verify the results struct `out` against the reference struct `ppref`
     
     flds = fieldnames(out);
@@ -194,19 +226,17 @@ for iname = 1 : length(filenames)
         end
     end
     
-   
-    
     % extract reference transmission losses
     
-    Lb_ref    = str2double(Y(:,39));
-    Lbfsg_ref = str2double(Y(:,40));
-    Lb0p_ref  = str2double(Y(:,41));
-    Lb0b_ref  = str2double(Y(:,42));
-    Ldsph_ref = str2double(Y(:,43));
-    Ld50_ref  = str2double(Y(:,44));
-    Ldp_ref   = str2double(Y(:,45));
-    Lbs_ref   = str2double(Y(:,46));
-    Lba_ref   = str2double(Y(:,47));
+    Lb_ref    = str2double(Y(:,38));
+    Lbfsg_ref = str2double(Y(:,39));
+    Lb0p_ref  = str2double(Y(:,40));
+    Lb0b_ref  = str2double(Y(:,41));
+    Ldsph_ref = str2double(Y(:,42));
+    Ld50_ref  = str2double(Y(:,43));
+    Ldp_ref   = str2double(Y(:,44));
+    Lbs_ref   = str2double(Y(:,45));
+    Lba_ref   = str2double(Y(:,46));
     
     
     % compute the transmission losses using MATLAB functions
@@ -237,17 +267,35 @@ for iname = 1 : length(filenames)
             p452.press,...
             dlt, ...
             dlr);
+
+%         % The path length expressed as the angle subtended by d km at the center of
+%         % a sphere of effective Earth radius ITU-R P.2001-4 (3.5.4)
+% 
+%         theta_e = dtot/ae; % radians
+% 
+%         [hst, hsr, hstd, hsrd, hte, hre, hm, dlt, dlr, theta_t, theta_r, theta, pathtype] = smooth_earth_heights(p452.path.d, p452.path.h, p452.htg, p452.hrg, ae, ff(i));
+% 
+%         % Calculate the horizon elevation angles limited such that they are positive
+% 
+%         theta_tpos = max(theta_t, 0);                   % Eq (3.7.11a) ITU-R P.2001-4
+%         theta_rpos = max(theta_r, 0);                   % Eq (3.7.11b) ITU-R P.2001-4
+% 
+%         [dt_cv, phi_cve, phi_cvn] = tropospheric_path(dtot, hts, hrs, theta_e, theta_tpos, theta_rpos, p452.phir_e, p452.phit_e, p452.phir_n, p452.phit_n, Re);
+% 
+%         % height of the Earth's surface above sea level where the common volume is located
+% 
+%         Hs = surface_altitude_cv(h, d, dt_cv)/1000.0; % in km
+% 
+%         [Lbs(offset + i), theta_s] = tl_troposcatter(ff(i), dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, p452.Gt, p452.Gr, pp(i), Hs);
+% 
+%         %% To avoid under-estimating troposcatter for short paths, limit Lbs (E.17)
+%         Lbs(offset + i) = max(Lbs(offset + i), Lbfsg(offset + i));
+
         
-        Lbs(offset + i) = tl_tropo(dtot, ...
-            theta, ...
-            ff(i), ...
-            pp(i), ...
-            p452.temp, ...
-            p452.press, ...
-            p452.N0, ...
-            p452.Gt, ...
-            p452.Gr );
+        % Calculate the basic transmission loss due to troposcatter not exceeded
+        % for any time percantage p 
         
+        Lbs(offset + i) = tl_tropo(dtot, theta, ff(i), pp(i), p452.temp, p452.press, N0, p452.Gt, p452.Gr );
         
         Lba(offset + i) = tl_anomalous(dtot, ...
             dlt, ...
@@ -270,19 +318,19 @@ for iname = 1 : length(filenames)
             ae, ...
             b0);
         
-        Lbulla{offset + i} = dl_bull(dc, hc, hts, hrs, ae, ff(i));
+        Lbulla{offset + i} = dl_bull(d, g, hts, hrs, ae, ff(i));
         
         % Use the method in 4.2.1 for a second time, with all profile heights hi
         % set to zero and modified antenna heights given by
         
         hts1 = hts - hstd;   % eq (38a)
         hrs1 = hrs - hsrd;   % eq (38b)
-        h1 = zeros(size(hc));
+        h1 = zeros(size(h));
         
         % where hstd and hsrd are given in 5.1.6.3 of Attachment 2. Set the
         % resulting Bullington diffraction loss for this smooth path to Lbulls
         
-        Lbulls{offset + i} = dl_bull(dc, h1, hts1, hrs1, ae, ff(i));
+        Lbulls{offset + i} = dl_bull(d, h1, hts1, hrs1, ae, ff(i));
         
         % Use the method in 4.2.2 to radiomaps the spherical-Earth diffraction loss
         % for the actual path length (dtot) with
@@ -297,29 +345,27 @@ for iname = 1 : length(filenames)
         Ld{offset + i}(1) = Lbulla{offset + i} + max(Ldsph{offset + i}(1) - Lbulls{offset + i}, 0);  % eq (40)
         Ld{offset + i}(2) = Lbulla{offset + i} + max(Ldsph{offset + i}(2) - Lbulls{offset + i}, 0);  % eq (40)%%
         
-        [ Ldp{offset+i}, Ld50{offset+i} ] = dl_p( dc, hc, hts, hrs, hstd, hsrd, ff(i), omega, pp(i), b0, p452.DN );
+        [ Ldp{offset+i}, Ld50{offset+i} ] = dl_p( d, g, hts, hrs, hstd, hsrd, ff(i), omega, pp(i), b0, DN );
         
         Lb(offset+i) = tl_p452(ff(i), ...
             pp(i), ...
             p452.path.d, ...
             p452.path.h, ...
+            p452.path.g,...
             p452.path.zone, ...
             p452.htg, ...
             p452.hrg, ...
-            p452.phi_path,...
+            p452.phit_e,...
+            p452.phit_n,...
+            p452.phir_e,...
+            p452.phir_n,...
             p452.Gt, ...
             p452.Gr, ...
             p452.pol, ...
             p452.dct, ...
             p452.dcr, ...
-            p452.DN, ...
-            p452.N0, ...
             p452.press, ...
-            p452.temp, ...
-            p452.ha_t, ...
-            p452.ha_r, ...
-            p452.dk_t, ...
-            p452.dk_r);
+            p452.temp);
         
         out1.Lbfsg(i+offset) = Lbfsg(i)-Lbfsg_ref(i);
         out1.Lb0p(i+offset) = Lb0p(i)-Lb0p_ref(i);
@@ -332,9 +378,9 @@ for iname = 1 : length(filenames)
         out1.Lb(i+offset) = Lb(i)-Lb_ref(i);
         
         if(flag_createlog==1)
-         fprintf(fidlog, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s,%f,%f,%f,%f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f \n', ...
-             Y{i,1}, Y{i,2},Y{i,3},Y{i,4},Y{i,5},num2str(phi_path),Y{i,7},Y{i,8},Y{i,9},...
-             Y{i,10},Y{i,11},Y{i,12},Y{i,13},Y{i,14},Y{i,15},Y{i,16},Y{i,17},Y{i,18},Y{i,19},...
+         fprintf(fidlog, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s,%f,%f,%f,%f,%f,%f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f,%.8f \n', ...
+             Y{i,1}, Y{i,2},Y{i,3},Y{i,4},Y{i,5},Y{i,6},Y{i,7},Y{i,8},Y{i,9},...
+             Y{i,10},Y{i,11},Y{i,12},Y{i,13},Y{i,14},Y{i,15},Y{i,16},...
                 ae, ...
                 dtot, ...
                 hts, ...
@@ -349,11 +395,13 @@ for iname = 1 : length(filenames)
                 hsrd, ...
                 dlt, ...
                 dlr, ...
-                Y{1,34}, ...
+                Y{1,31}, ...
                 dtm, ...
                 dlm, ...
                 b0, ...
                 omega, ...
+                DN, ...
+                N0, ...
                 Lb(i), ...
                 Lbfsg(i), ...
                 Lb0p(i), ...
@@ -367,7 +415,7 @@ for iname = 1 : length(filenames)
         
         end
     end
-    
+
     %% verify error in the results out1 against tolarance
     
     flds = fieldnames(out1);
