@@ -1,5 +1,5 @@
 % MATLAB/Octave script that is used to verify the implementation of
-% Recommendation ITU-R P.452-17 (as defined in the file tl_p452.m and the
+% Recommendation ITU-R P.452 (as defined in the file tl_p452.m and the
 % functions called therefrom) using a set of test terrain profiles provided by the user.
 %
 % The script reads all the test profiles from the folder defined by
