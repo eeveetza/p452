@@ -157,6 +157,8 @@ if length(d)<4
     error('tl_p452: path profile requires at least 4 points.');
 end
 
+% Section 4.5: The overall prediction
+
 di = d(2:end-1);
 hi = h(2:end-1);
 
@@ -173,8 +175,6 @@ Str = (hrs - hts)/dtot;                                         % Eq (15)
 THETA = 0.3;
 KSI = 0.8;
 
-% changed the definition for Fj on 15DEC16.
-%Fj = 1.0 - 0.5*( 1.0 + tanh(3.0 * KSI * (theta-THETA)/THETA) )
 Fj = 1.0 - 0.5*( 1.0 + tanh(3.0 * KSI * (Stim-Str)/THETA) );
 
 % Calculate an interpolation factor, Fk, to take account of the great
