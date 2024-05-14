@@ -93,12 +93,12 @@ end
 % Apply the condition in Step 4: Radio profile 
 % gi is the terrain height in metres above sea level for all the points at a distance from transmitter or receiver less than 50 m.
 
-kk = find(d < 50/1000 - eps);
+kk = find(d < 50/1000);
 if (~isempty(kk))
     g(kk) = h(kk);
 end
 
-endVal = d(end) - 50/1000 + eps;
+endVal = d(end) - 50/1000;
 kk = find(d > endVal);
 if (~isempty(kk))
     g(kk) = h(kk);
