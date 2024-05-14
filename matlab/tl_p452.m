@@ -1,6 +1,6 @@
 function Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp)
 %tl_p452 basic transmission loss according to ITU-R P.452-18
-%   Lb = tl_p452(f, p, d, h, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp)
+%   Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp)
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
 %   as defined in ITU-R P.452-18 (Section 4.5) for clear-air conditions. Other functions called from
@@ -14,7 +14,7 @@ function Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phi
 %     h       -   vector of heights hi of the i-th profile point (meters
 %                 above mean sea level. Both vectors contain n+1 profile points
 %     g       -   vector of clutter + terrain profile heights gi along the path gi = hi + Ri (masl) 
-%                 where Ri is the (representative clutter height) 
+%                 where Ri is the (representative) clutter height 
 %     zone    -   vector of zone types: Coastal land (1), Inland (2) or Sea (3)
 %     htg     -   Tx Antenna center heigth above ground level (m)
 %     hrg     -   Rx Antenna center heigth above ground level (m)
@@ -93,12 +93,13 @@ end
 % Apply the condition in Step 4: Radio profile 
 % gi is the terrain height in metres above sea level for all the points at a distance from transmitter or receiver less than 50 m.
 
-kk = find(d < 50/1000);
+kk = find(d < 50/1000 - eps);
 if (~isempty(kk))
     g(kk) = h(kk);
 end
 
-kk = find(d(end)-d < 50/1000);
+endVal = d(end) - 50/1000 + eps;
+kk = find(d > endVal);
 if (~isempty(kk))
     g(kk) = h(kk);
 end

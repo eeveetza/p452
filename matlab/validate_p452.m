@@ -75,12 +75,13 @@ for iname = 1 : length(filenames)
     % Apply the condition in Step 4: Radio profile 
     % gi is the terrain height in metres above sea level for all the points at a distance from transmitter or receiver less than 50 m.
     
-    kk = find(p452.path.d < 50/1000);
+    kk = find(p452.path.d < 50/1000 - eps);
     if (~isempty(kk))
         p452.path.g(kk) = p452.path.h(kk);
     end
     
-    kk = find(p452.path.d(end)-p452.path.d < 50/1000);
+    endVal = p452.path.d(end) - 50/1000 + eps;
+    kk = find(p452.path.d > endVal);
     if (~isempty(kk))
         p452.path.g(kk) = p452.path.h(kk);
     end

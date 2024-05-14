@@ -269,12 +269,12 @@ if checkInput(hObject, eventdata, handles)
         % Apply the condition in Step 4: Radio profile
         % gi is the terrain height in metres above sea level for all the points at a distance from transmitter or receiver less than 50 m.
 
-        kk = find(handles.p452.path.d < 50/1000);
+        kk = find(handles.p452.path.d < 50/1000 - eps);
         if (~isempty(kk))
             handles.p452.path.g(kk) = handles.p452.path.h(kk);
         end
-
-        kk = find(handles.p452.path.d(end)-handles.p452.path.d < 50/1000);
+        endVal = handles.p452.path.d(end) - 50/1000 + eps;
+        kk = find(handles.p452.path.d > endVal);
         if (~isempty(kk))
             handles.p452.path.g(kk) = handles.p452.path.h(kk);
         end
