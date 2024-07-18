@@ -1,4 +1,4 @@
-[Development] P452 Version 18.0 (15.11.23)
+P452 Version 18.0 (16.05.24)
 
 GENERAL NOTES
 ----------------
@@ -33,8 +33,11 @@ All the scripts (except for the Graphical User Interface) work in Octave (versio
 
 UPDATES AND FIXES
 -----------------
-[Development] Version 18.0 (15.11.23)
+Version 18.0 (16.05.24)
     - Aligned with Rec ITU-R P.452-18 (distributed clutter model)
+    - Included separate input arguments for Tx/Rx longitude and latitude
+    - Removed input arguments for surface refractivity and refractity gradient
+    - Updated the MATLAB P452 GUI to account for the above changes
     - Updated the existing validation examples and added new validation examples
 
 Version 17.1 (25.04.23)
