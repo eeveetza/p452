@@ -1,13 +1,14 @@
-P452 Version 17.1 (25.04.23)
+
+P452 Version 18.0 (16.05.24)
 
 GENERAL NOTES
 ----------------
-- This MATLAB/Octave program computes the basic transmission loss according to Recommendation ITU-R P.452-17.
+- This MATLAB/Octave program computes the basic transmission loss according to Recommendation ITU-R P.452-18.
 
 - The folder contains the following:
 
 
-  1) tl_p452.m is the main function implementing Recommendation ITU-R P.452-17. This function calls
+  1) tl_p452.m is the main function implementing Recommendation ITU-R P.452-18. This function calls
      other matlab routines defined in subfolder ./private/
      To know how to use the function, read the header of the function or type
      >> help tl_p452 
@@ -33,6 +34,13 @@ All the scripts (except for the Graphical User Interface) work in Octave (versio
 
 UPDATES AND FIXES
 -----------------
+Version 18.0 (16.05.24)
+    - Aligned with Rec ITU-R P.452-18 (distributed clutter model)
+    - Included separate input arguments for Tx/Rx longitude and latitude
+    - Removed input arguments for surface refractivity and refractity gradient
+    - Updated the MATLAB P452 GUI to account for the above changes
+    - Updated the existing validation examples and added new validation examples
+
 Version 17.1 (25.04.23)
     - Corrected an indexing issue in path_fraction.m and longest_cont_dist.m
     - Corrected various issues in pw2p.m
