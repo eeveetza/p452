@@ -17,6 +17,7 @@ The following table describes the structure of the folder `./matlab/`.
 | File/Folder               | Description                                                         |
 |----------------------------|---------------------------------------------------------------------|
 |`tl_p452.m`                | MATLAB function implementing Recommendation ITU-R P.452-18         |
+|`initiate_digital_maps.m`| MATLAB script that processes the ITU-R maps and generates the necessary functions. It needs to be run prior to using this software implementation. For details, see [Integrating ITU Digital Products](#integrating-itu-digital-products). |
 |`validate_p452.m`          | MATLAB script used to validate the implementation of this Recommendation in `tl_p452.m` against the reference data in `validation_examples`.  It works in both MATLAB and Octave on Windows and MacOS.           |
 |`./validation_examples/`    | Folder containing a non-exhaustive set of validation examples, in a form of .csv files, for different terrain profiles, clutter height profiles, frequencies, time-probabilities, etc. They include intermediate and final results of the calculations performed within P.452-18 with the aim of facilitating testing and validation, as well as comparison between different software implementations. |
 |`./private/`   |  Folder containing all the MATLAB routines necessary for the implementation of the propagation model, including the MATLAB implementation of Recommendation ITU-R P.676-11 (computing the specific attenuation due to dry air and water vapor by means of a summation of individual resonance lines from oxigen and water vapor). This folder contains test functions used to verify the current implementation of the model. It also contains several files with path profile data used in testing.|
@@ -24,7 +25,25 @@ The following table describes the structure of the folder `./matlab/`.
 |`test_example.mat`                | An example of simulation data file that can be opened by the GUI. |
 
 
+## Integrating ITU Digital Products
 
+This software uses ITU digital products that are integral part of Recommendations. These products must not be reproduced or distributed without explicit written permission from the ITU.
+
+### Setup Instructions
+
+1. **Download and extract the required maps** to `./private/maps`:
+
+   - From [ITU-R P.452-18](https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.452-18-202310-I!!ZIP-E.zip):
+     - `N050.TXT`
+     - `DN50.TXT`
+
+2. **Run the script** `initiate_digital_maps.m` to generate the necessary functions for retrieving and interpolating data from from the maps.
+
+### Notes
+
+- Ensure all files are placed in `./private/maps` before running the script.
+- The script processes the maps, which are critical for the software’s functionality.
+- The resulting `*.m` files are placed in the folder `./private`.
 
 ## Function Call
 

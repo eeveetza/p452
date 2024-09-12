@@ -32,3 +32,11 @@
 *.app
 
 .DS_Store
+*.asv
+
+# Ignore all the files in the folder maps
+/matlab/private/maps/*.*
+!/matlab/private/maps/.gitkeep
+
+# Ignore all files starting with DigitalMaps_ in the private folder
+/matlab/private/DigitalMaps_*

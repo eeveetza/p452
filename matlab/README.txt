@@ -1,5 +1,5 @@
 
-P452 Version 18.0 (16.05.24)
+P452 Version 18.1 (12.09.24)
 
 GENERAL NOTES
 ----------------
@@ -13,27 +13,42 @@ GENERAL NOTES
      To know how to use the function, read the header of the function or type
      >> help tl_p452 
 
-  2) Subfolder ./private/ with all the MATLAB routines necessary for the implementation of the
+  2) initiate_digital_maps.m is the MATLAB script that processes the ITU-R maps and generates the necessary functions. 
+     This software uses ITU digital products that are integral part of Recommendations. 
+     These products must not be reproduced or distributed without explicit written permission from the ITU.
+
+     a) Download and extract the required maps to `./private/maps` 
+        From https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.452-18-202310-I!!ZIP-E.zip:
+        - N050.TXT
+        - DN50.TXT
+
+     b) Run the script initiate_digital_maps.m to generate the necessary functions for retrieving and interpolating data. 
+        The resulting `*.m` files are placed in the folder `./private`.
+   
+  3) Subfolder ./private/ with all the MATLAB routines necessary for the implementation of the
      propagation model, including the MATLAB implementation of Recommendation ITU-R P.676-11
      (computing the specific attenuation due to dry air and water vapor by means of a summation
      of individual resonance lines from oxigen and water vapor).
 
-  3) Graphical User Interface defined in files P452.m and P452.fig (only MATLAB)
+  4) Graphical User Interface defined in files P452.m and P452.fig (only MATLAB)
      The interface can be opened by invoking the following command in the MATLAB command window 
      >> P452
 
-  4) test_example.mat is an example of simulation data file that can be opened by the GUI
+  5) test_example.mat is an example of simulation data file that can be opened by the GUI
   
-  5) Subfolder ./private/ also contains test functions used to verify the current implementation of the model.
+  6) Subfolder ./private/ also contains test functions used to verify the current implementation of the model.
      including several files with path profile data used in testing.
 
-  6) Folder validation_examples containing the path profiles and reference data (as .csv files) to test the software implementation using validate_p452.m,
+  7) Folder validation_examples containing the path profiles and reference data (as .csv files) to test the software implementation using validate_p452.m,
       which runs on both MATLAB and Octave, Windows and MacOS.
 
 All the scripts (except for the Graphical User Interface) work in Octave (versions 6.0 and above).
 
 UPDATES AND FIXES
 -----------------
+Version 18.1 (12.09.24)
+    - Introduced functions and workflow for integrating ITU-R maps
+
 Version 18.0 (16.05.24)
     - Aligned with Rec ITU-R P.452-18 (distributed clutter model)
     - Included separate input arguments for Tx/Rx longitude and latitude

@@ -2,11 +2,9 @@ function y = get_interp2(mapstr, phie, phin)
 %get_inter2 Interpolates the value from Map at a given phie,phin
 %
 %     Input parameters:
-%     map     -   string pointing to the radiometeorological map
-%                 'DN50', or 'N050'
-%                 (rows-latitude: 90 to -90, columns-longitude: 0 to 360)
-%     phie    -   Longitude, positive to east (deg)
-%     phin    -   Latitude, positive to north (deg)
+%     mapstr  -   string pointing to the radiometeorological map
+%     phie    -   Longitude, positive to east (deg) [-180, 180]
+%     phin    -   Latitude, positive to north (deg) [-90, 90]
 %     spacing -   Resolution in latitude/longitude (deg)
 %
 %     Output parameters:
@@ -14,28 +12,64 @@ function y = get_interp2(mapstr, phie, phin)
 %
 %     Rev   Date        Author                          Description
 %     -------------------------------------------------------------------------------
-%     v0    17APR23     Ivica Stevanovic, OFCOM         Initial version
+%     v0    09SEP24     Ivica Stevanovic, OFCOM         Initial version
+
+
+if (phin < -90 || phin > 90)
+    error ('Latitude must be within the range -90 to 90 degrees');
+end
+
+if (phie < -180 || phie > 180)
+    error('Longitude must be within the range -180 to 180 degrees');
+end
+
+errorstr = sprintf(['DigitalMaps_%s() not found. \n' ...
+    '\nBefore running get_interp2, make sure to: \n' ...
+    '    1. Download and extract the required maps to ./private/maps:\n' ...
+    '        - From ITU-R P.452-18: DN50.TXT and N050.TXT\n' ...
+    '    2. Run the script initiate_digital_maps.m to generate the necessary functions.\n'], mapstr);
+
 
 switch mapstr
     case 'DN50'
-        map = DigitalMaps_DN50();
+        try
+            map = DigitalMaps_DN50();
+        catch
+            error(errorstr);
+        end
         nr = 121;
         nc = 241;
         spacing = 1.5;
+        % lat starts with 90
+        latitudeOffset = 90 - phin;
+        % lon starts with 0
+        longitudeOffset = phie;
+        if phie < 0
+            longitudeOffset = phie + 360;
+        end
+
+
     case 'N050'
-        map = DigitalMaps_N050();
+        try
+            map = DigitalMaps_N050();
+        catch
+            error(errorstr);
+        end
         nr = 121;
         nc = 241;
         spacing = 1.5;
+        % lat starts with 90
+        latitudeOffset = 90 - phin;
+        % lon starts with 0
+        longitudeOffset = phie;
+        if phie < 0
+            longitudeOffset = phie + 360;
+        end
+
+    otherwise
+
+        error('Error in function call. Uknown map: %s.\n',mapstr);
 end
-
-longitudeOffset = phie;
-
-if (phie < 0.0)
-    longitudeOffset = phie + 360;
-end
-
-latitudeOffset = 90.0 - phin;
 
 latitudeIndex  = floor(latitudeOffset / spacing)  + 1;
 longitudeIndex = floor(longitudeOffset / spacing) + 1;
