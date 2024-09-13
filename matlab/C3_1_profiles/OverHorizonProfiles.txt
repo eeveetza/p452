@@ -1,0 +1,205 @@
+>> OverHorizonProfiles
+Stn 1, 2.8 GHz, 139.47 km, 12 mr, SHANGHAI      [SHAN] - CHANGZHOU     [CHAN], calculated dist = 139.3858 km, error = -0.084234 km
+Stn 2, 2.8 GHz, 219.13 km, 21 mr, BEIJING       [BEIJ] - GAOCHENG      [GAOC], calculated dist = 218.9915 km, error = -0.13852 km
+Stn 3, 2.8 GHz, 228.54 km, 26 mr, SHANGHAI      [SHAN] - NANJING       [NANJ], calculated dist = 228.3971 km, error = -0.14293 km
+Stn 209, 0.56 GHz, 157.75 km, 18.96 mr, COLUMBUS GA   [COLU] - POWDER SPRINGS[POWD], no coordinates provided -> ##### NO PROFILE #####
+Stn 229, 0.76 GHz, 158.78 km, 11.2 mr, READING PA    [READ] - LAUREL MD     [LAUR], no coordinates provided -> ##### NO PROFILE #####
+Stn 316, 1.05 GHz, 365.6 km, 28.44 mr, CHEYENNE MT CO[CHM ] - GARDEN CITY KA[GCY ], calculated dist = 364.7816 km, error = -0.8184 km
+Stn 317, 1.05 GHz, 365.6 km, 30.55 mr, CHEYENNE MT CO[CHM ] - GARDEN CITY KA[GCY ], calculated dist = 364.7816 km, error = -0.8184 km
+Stn 429, 1.05 GHz, 382.7 km, 23.32 mr, PIKES PEAK CO [PIKE] - GARDEN CITY KA[GCY ], calculated dist = 381.8759 km, error = -0.82411 km
+Stn 466, 0.54 GHz, 186.48 km, 19.34 mr, BRIDGEPORT CN [BRID] - MILLIS MA     [MILL], no coordinates provided -> ##### NO PROFILE #####
+Stn 467, 0.54 GHz, 155.61 km, 7.29 mr, BRIDGEPORT CN [BRID] - PRINCETON NJ  [PRIN], no coordinates provided -> ##### NO PROFILE #####
+Stn 480, 0.92 GHz, 402 km, 58.4 mr, LEXINGTON MA  [LEXI] - SYRACUSE NY   [SYRA], calculated dist = 400.8127 km, error = -1.1873 km
+Stn 570, 0.51 GHz, 155.47 km, 90.59 mr, NORTH ADAMS MA[NORT] - MILLIS MA     [MILL], no coordinates provided -> ##### NO PROFILE #####
+Stn 577, 0.54 GHz, 207.09 km, 47.26 mr, FRESNO CA     [FRES] - LIVERMORE CA  [LIVE], no coordinates provided -> ##### NO PROFILE #####
+Stn 578, 0.67 GHz, 207.09 km, 47.26 mr, FRESNO CA     [FRES] - LIVERMORE CA  [LIVE], no coordinates provided -> ##### NO PROFILE #####
+Stn 585, 0.56 GHz, 416.86 km, 38.73 mr, WILKES-BARRE  [WILK] - LAUREL MD     [LAUR], no coordinates provided -> ##### NO PROFILE #####
+Stn 591, 2.82 GHz, 248.1 km, 27.7 mr, MOORESTOWN NJ [MTW ] - STERLING VA   [STER], calculated dist = 247.6964 km, error = -0.40361 km
+Stn 908, 3.67 GHz, 301.87 km, 28.17 mr, CRAWFORD HILL [CRAW] - ROUND HILL MA [ROUN], calculated dist = 301.6799 km, error = -0.19009 km
+Stn 1124, 4.11 GHz, 275.1 km, 28.67 mr, PHARSALIA NY  [PHAR] - CRAWFORDS HILL[CRAW], calculated dist = 275.1586 km, error = 0.0586 km
+Stn 1132, 0.88 GHz, 298.97 km, 26.55 mr, FLORIDA CITY  [FLOR] - GUANABO       [GUAN], calculated dist = 298.7786 km, error = -0.19138 km
+Stn 1438, 2.72 GHz, 345.7 km, 38.21 mr, OTTAWA        [OTTA] - TORONTO       [TORO], calculated dist = 345.0142 km, error = -0.68575 km
+Stn 1439, 2.72 GHz, 345.7 km, 38.08 mr, OTTAWA        [OTTA] - OTTAWA        [OTTA], calculated dist = 345.0142 km, error = -0.68575 km
+Stn 1440, 0.51 GHz, 276.95 km, 22.74 mr, ST ANTHONY    [STAN] - GANDER        [GAND], calculated dist = 276.7788 km, error = -0.17119 km
+Stn 1441, 4.09 GHz, 276.95 km, 22.74 mr, ST ANTHONY    [STAN] - GANDER        [GAND], calculated dist = 276.7788 km, error = -0.17119 km
+Stn 1564, 0.86 GHz, 380.12 km, NaN mr, SIDI SLIMANE  [SIDI] - SAN PABLO     [SANP], no coordinates provided -> ##### NO PROFILE #####
+Stn 1574, 0.83 GHz, 577.38 km, 35.22 mr, BINIANCOLLA MN[BIBI] - MARRUBIU SARD [MARR], no coordinates provided -> ##### NO PROFILE #####
+Stn 1700, 0.95 GHz, 226.97 km, 26.86 mr, WILLIAMS AFB  [WILL] - BLACKTAIL CYN [BLAC], calculated dist = 226.8297 km, error = -0.1403 km
+Stn 1701, 0.88 GHz, 226.97 km, 26.86 mr, BLACKTAIL CYN [BLAC] - WILLIAMS AFB  [WILL], calculated dist = 226.8297 km, error = -0.1403 km
+Stn 1704, 0.81 GHz, 554 km, 80.14 mr, BENSON AR     [BENS] - ENCINO NM     [ENCI], calculated dist = 553.7704 km, error = -0.22959 km
+Stn 1705, 0.81 GHz, 554.12 km, 80.14 mr, BENSON AR     [BENS] - ENCINO NM     [ENCI], calculated dist = 553.7704 km, error = -0.34959 km
+Stn 1805, 0.96 GHz, 430.5 km, 81.83 mr, VERONA NY     [VERO] - LIBERTY DAM MD[LIBE], calculated dist = 431.1371 km, error = 0.63712 km
+Stn 1903, 9.37 GHz, 306.39 km, 29.76 mr, SANTA BARBARA [SANT] - POINT LOMA CA [PLA ], calculated dist = 306.2003 km, error = -0.18974 km
+Stn 1905, 3.41 GHz, 306.39 km, 29.76 mr, SANTA BARBARA [SANT] - POINT LOMA CA [PLA ], calculated dist = 306.2003 km, error = -0.18974 km
+Stn 1906, 1.37 GHz, 306.39 km, 29.76 mr, SANTA BARBARA [SANT] - POINT LOMA CA [PLA ], calculated dist = 306.2003 km, error = -0.18974 km
+Stn 1907, 1.25 GHz, 306.39 km, 29.76 mr, SANTA BARBARA [SANT] - POINT LOMA CA [PLA ], calculated dist = 306.2003 km, error = -0.18974 km
+Stn 1908, 9.37 GHz, 227.89 km, 21.36 mr, POINT MUGU CA [PMU ] - POINT LOMA CA [PLA ], calculated dist = 227.7481 km, error = -0.14189 km
+Stn 1909, 1.37 GHz, 227.89 km, 21.36 mr, POINT MUGU CA [PMU ] - POINT LOMA CA [PLA ], calculated dist = 227.7481 km, error = -0.14189 km
+Stn 1981, 0.57 GHz, 120.83 km, 5.69 mr, CRYSTAL PALACE[CRYS] - BAWDSEY ENG   [BAWD], calculated dist = 120.7493 km, error = -0.080676 km
+Stn 1982, 0.57 GHz, 122.14 km, 7 mr, CRYSTAL PALACE[CRYS] - PETERBOROUGH  [PETE], calculated dist = 122.0593 km, error = -0.080729 km
+Stn 1983, 0.57 GHz, 147.48 km, 8.15 mr, CRYSTAL PALACE[CRYS] - TACOLNESTON EN[TACO], calculated dist = 147.3838 km, error = -0.096156 km
+Stn 1985, 0.63 GHz, 144.19 km, 13.58 mr, SUTTON COLDFLD[SUTT] - HATFIELD ENG  [HATF], calculated dist = 144.0966 km, error = -0.09336 km
+Stn 1986, 0.63 GHz, 148.79 km, 10.1 mr, SUTTON COLDFLD[SUTT] - BROOKMANS PARK[BROO], calculated dist = 148.694 km, error = -0.096025 km
+Stn 1987, 0.56 GHz, 202.6 km, 17.07 mr, SCHEVENINGEN  [SCH ] - HAPPISBURGH EN[HAP ], calculated dist = 202.4733 km, error = -0.12673 km
+Stn 1989, 0.56 GHz, 258.39 km, 26.24 mr, SCHEVENINGEN  [SCH ] - FELTWELL ENG  [FELT], calculated dist = 258.2324 km, error = -0.15758 km
+Stn 1990, 0.56 GHz, 316.74 km, 28.64 mr, SCHEVENINGEN  [SCH ] - MORBOURNE HILL[MORB], calculated dist = 316.538 km, error = -0.20198 km
+Stn 1991, 0.56 GHz, 356.29 km, 32.54 mr, SCHEVENINGEN  [SCH ] - SKEFFINGTON EN[SKEF], calculated dist = 356.0622 km, error = -0.22776 km
+Stn 2032, 0.56 GHz, 273.4 km, 18.43 mr, HOLME MOSS    [HOLM] - KINGSWOOD ENG [KING], calculated dist = 273.226 km, error = -0.17396 km
+Stn 2045, 0.56 GHz, 171.06 km, 15.91 mr, PONTOP PIKE EN[PONT] - OTTRINGHAM ENG[OTTR], calculated dist = 170.9534 km, error = -0.10661 km
+Stn 2046, 0.56 GHz, 210.46 km, 14.64 mr, PONTOP PIKE EN[PONT] - DORKET HEAD EN[DORK], calculated dist = 210.3311 km, error = -0.12894 km
+Stn 2047, 0.56 GHz, 330.69 km, 26.24 mr, PONTOP PIKE EN[PONT] - MURSLEY ENG   [MURS], calculated dist = 330.4826 km, error = -0.20744 km
+Stn 2049, 0.56 GHz, 465.63 km, 42.84 mr, PONTOP PIKE EN[PONT] - BEDDINGHAM ENG[BEDD], calculated dist = 465.3384 km, error = -0.29157 km
+Stn 2063, 9.64 GHz, 278.8 km, 25.61 mr, START POINT EN[STP ] - WEMBLEY ENG   [WEM ], calculated dist = 278.8264 km, error = 0.026411 km
+Stn 2067, 3.48 GHz, 399.5 km, 41.15 mr, START POINT EN[STP ] - WITNESHAM ENG [WITN], calculated dist = 398.2612 km, error = -1.2388 km
+Stn 2068, 3.48 GHz, 259.19 km, 30.72 mr, START POINT EN[STP ] - SLOUGH ENG    [SLOU], calculated dist = 259.0238 km, error = -0.16623 km
+Stn 2093, 0.09 GHz, 121.69 km, 15.3 mr, PETERBOROUGH  [PETE] - CAVERSHAM ENG [CAVE], calculated dist = 121.6107 km, error = -0.079277 km
+Stn 2098, 1.37 GHz, 150.75 km, 19.03 mr, BACKWELL ENG  [BACK] - SLOUGH ENG    [SLOU], calculated dist = 150.6553 km, error = -0.094691 km
+Stn 2101, 0.77 GHz, 137.68 km, 14 mr, PONTOP PIKE EN[PONT] - MOORSIDE EDGE [MRE ], calculated dist = 137.5928 km, error = -0.087239 km
+Stn 2102, 0.77 GHz, 210.46 km, 14.74 mr, PONTOP PIKE EN[PONT] - DORKET HEAD EN[DORK], calculated dist = 210.3311 km, error = -0.12894 km
+Stn 2103, 0.77 GHz, 330.69 km, 26.35 mr, PONTOP PIKE EN[PONT] - MURSLEY ENG   [MURS], calculated dist = 330.4826 km, error = -0.20744 km
+Stn 2104, 0.77 GHz, 411.65 km, 38.68 mr, PONTOP PIKE EN[PONT] - KINGSWOOD ENG [KING], calculated dist = 411.3917 km, error = -0.25833 km
+Stn 2105, 0.77 GHz, 463.2 km, 42.87 mr, PONTOP PIKE EN[PONT] - BEDDINGHAM ENG[BEDD], calculated dist = 462.9105 km, error = -0.28953 km
+Stn 2108, 0.77 GHz, 383.96 km, 42.63 mr, PONTOP PIKE EN[PONT] - SLOUGH ENG    [SLOU], calculated dist = 383.7183 km, error = -0.24168 km
+Stn 2110, 0.56 GHz, 368.29 km, 35.35 mr, SCHEVENINGEN  [SCH ] - FLAMBOROUGH HD[FLA ], calculated dist = 368.0575 km, error = -0.23249 km
+Stn 2111, 0.56 GHz, 541.99 km, 59.08 mr, SCHEVENINGEN  [SCH ] - NEWTON B.T.SEA[NEW ], calculated dist = 541.6541 km, error = -0.33594 km
+Stn 2112, 0.56 GHz, 696.79 km, 80.58 mr, SCHEVENINGEN  [SCH ] - BRIDGE OF DON [BRD ], calculated dist = 696.3536 km, error = -0.43637 km
+Stn 2113, 0.56 GHz, 955.07 km, 114.15 mr, SCHEVENINGEN  [SCH ] - LERWICK SHTLDS[LER ], calculated dist = 954.4713 km, error = -0.59867 km
+Stn 2115, 0.56 GHz, 504.32 km, 51.43 mr, SCHEVENINGEN  [SCH ] - PONTOP PIKE EN[PONT], calculated dist = 504.0042 km, error = -0.31584 km
+Stn 2163, 0.65 GHz, 276.16 km, 33.48 mr, CRYSTAL PALACE[CRYS] - STOKE FLEMING [STOK], calculated dist = 275.9916 km, error = -0.1684 km
+Stn 2164, 0.65 GHz, 355.83 km, 31.59 mr, CRYSTAL PALACE[CRYS] - DARLINGTON ENG[DARL], calculated dist = 355.6076 km, error = -0.22244 km
+Stn 2186, 0.63 GHz, 236.03 km, 19.16 mr, LOPIK         [LOP ] - ALDEBURGH ENG [ALD ], calculated dist = 235.8863 km, error = -0.14366 km
+Stn 2188, 0.86 GHz, 328.3 km, 31.9 mr, GREAT BROMLEY [GBR ] - CATTERICK ENG [CATT], calculated dist = 328.0909 km, error = -0.20909 km
+Stn 2193, 0.88 GHz, 499.8 km, 60.46 mr, BELOWDA ENG   [BELO] - WEST BECKHAM E[WESB], calculated dist = 499.4869 km, error = -0.31312 km
+Stn 2194, 0.88 GHz, 275.13 km, 29.79 mr, BELOWDA ENG   [BELO] - WIDLEY ENG    [WIDL], calculated dist = 274.954 km, error = -0.176 km
+Stn 2212, 2.63 GHz, 151.3 km, 26.95 mr, MALVERN ENG   [MALV] - WEMBLEY ENG   [WEM ], calculated dist = 150.7481 km, error = -0.55186 km
+Stn 2213, 2.63 GHz, 151.3 km, 42.77 mr, MALVERN ENG   [MALV] - WEMBLEY ENG   [WEM ], calculated dist = 150.7481 km, error = -0.55186 km
+Stn 2233, 1.77 GHz, 287.2 km, 38.71 mr, WAKKANAI      [WAKK] - CHITOSE       [CHIT], calculated dist = 287.2842 km, error = 0.084217 km
+Stn 2234, 1.77 GHz, 239.8 km, 25.61 mr, CHITOSE       [CHIT] - MISAWA        [MISA], calculated dist = 240.0395 km, error = 0.2395 km
+Stn 2235, 1.77 GHz, 274.5 km, 37.3 mr, MISAWA        [MISA] - SENDAI        [SEND], calculated dist = 274.8454 km, error = 0.34537 km
+Stn 2236, 1.77 GHz, 309.8 km, 46.92 mr, SENDAI        [SEND] - FUNCHU        [FUNC], calculated dist = 310.1934 km, error = 0.39344 km
+Stn 2240, 1.77 GHz, 349 km, 285 mr, HAKONE        [HAKO] - ROKKO         [ROKK], calculated dist = 348.3396 km, error = -0.66044 km
+Stn 2241, 1.77 GHz, 296.5 km, 13.17 mr, ROKKO         [ROKK] - SOFU          [SOFU], calculated dist = 295.9632 km, error = -0.53679 km
+Stn 2246, 1.77 GHz, 230.8 km, 23.58 mr, SEBURIYAMA    [SEBU] - CHIRAN        [CHI ], calculated dist = 231.4642 km, error = 0.66418 km
+Stn 2272, 0.6 GHz, 309.96 km, 33.86 mr, KOKUBUNJI     [KOKU] - SENDAI        [SEND], calculated dist = 309.7631 km, error = -0.1969 km
+Stn 2273, 2.12 GHz, 309.96 km, 33.86 mr, KOKUBUNJI     [KOKU] - SENDAI        [SEND], calculated dist = 309.7631 km, error = -0.1969 km
+Stn 2282, 1.31 GHz, 438.32 km, 54.92 mr, MIYAZAKI      [MIYA] - WAKAYAMA      [WAKA], calculated dist = 438.0415 km, error = -0.27851 km
+Stn 2283, 3 GHz, 438.32 km, 54.92 mr, MIYAZAKI      [MIYA] - WAKAYAMA      [WAKA], calculated dist = 438.0415 km, error = -0.27851 km
+Stn 2297, 1.32 GHz, 426.71 km, 45.92 mr, KAZASHIYAMA   [KAZA] - OSAKA         [OSAK], calculated dist = 426.4407 km, error = -0.26927 km
+Stn 2304, 0.6 GHz, 344.7 km, 42.26 mr, KOKUBUNJI     [KOKU] - FURUKAWA      [FURU], calculated dist = 344.4881 km, error = -0.21185 km
+Stn 2305, 0.6 GHz, 225.67 km, 21.54 mr, KOKUBUNJI     [KOKU] - NIHONMATSU    [NIHO], calculated dist = 225.5304 km, error = -0.13962 km
+Stn 2306, 2.12 GHz, 344.7 km, 42.55 mr, KOKUBUNJI     [KOKU] - FURUKAWA      [FURU], calculated dist = 344.4881 km, error = -0.21185 km
+Stn 2307, 2.12 GHz, 225.67 km, 22.05 mr, KOKUBUNJI     [KOKU] - NIHONMATSU    [NIHO], calculated dist = 225.5304 km, error = -0.13962 km
+Stn 2311, 0.6 GHz, 364.52 km, 61.35 mr, KOKUBUNJI     [KOKU] - MT IKOMA      [MTIK], calculated dist = 364.2942 km, error = -0.22577 km
+Stn 2360, 1.85 GHz, 242.52 km, 12.27 mr, HOCHBLAUEN    [HOCH] - DARMSTADT     [DARM], calculated dist = 242.3717 km, error = -0.14828 km
+Stn 2388, 1.72 GHz, 419.1 km, 49.92 mr, LOHBRUGGE     [LOH ] - DARMSTADT     [DARM], calculated dist = 418.4475 km, error = -0.65251 km
+Stn 2475, 1.8 GHz, 722.01 km, 86.34 mr, SAIGON        [SAIG] - BANGKOK       [BANG], calculated dist = 721.5609 km, error = -0.44911 km
+Stn 2632, 2.17 GHz, 325.1 km, 34.78 mr, LANNION       [LAN ] - CONCHES       [CONC], calculated dist = 323.9335 km, error = -1.1665 km
+Stn 2633, 2.17 GHz, 325.1 km, 34.6 mr, LANNION       [LAN ] - CONCHES       [CONC], calculated dist = 323.9335 km, error = -1.1665 km
+Stn 2634, 2.17 GHz, 325.1 km, 34.8 mr, LANNION       [LAN ] - CONCHES       [CONC], calculated dist = 323.9335 km, error = -1.1665 km
+Stn 2635, 2.17 GHz, 325.1 km, 34.8 mr, LANNION       [LAN ] - CONCHES       [CONC], calculated dist = 323.9335 km, error = -1.1665 km
+Stn 2636, 2.17 GHz, 159.9 km, 9.03 mr, LANNION       [LAN ] - VILLEDIEU     [VILL], calculated dist = 159.2917 km, error = -0.60826 km
+Stn 2637, 2.17 GHz, 159.9 km, 9.27 mr, LANNION       [LAN ] - VILLEDIEU     [VILL], calculated dist = 159.2917 km, error = -0.60826 km
+Stn 2638, 2.17 GHz, 483.1 km, 52.79 mr, LANNION       [LAN ] - LAFERTE S.J.  [LAFE], calculated dist = 481.307 km, error = -1.793 km
+Stn 2639, 2.17 GHz, 483.1 km, 56.43 mr, LANNION       [LAN ] - LAFERTE S.J.  [LAFE], calculated dist = 481.307 km, error = -1.793 km
+Stn 4012, 0.5 GHz, 121.36 km, 2.73 mr, ROWRIDGE ENG  [ROWR] - ALDERNEY ENG  [ADY ], calculated dist = 121.2865 km, error = -0.073475 km
+Stn 4013, 0.5 GHz, 121.36 km, 2.16 mr, ROWRIDGE ENG  [ROWR] - ALDERNEY ENG  [ADY ], calculated dist = 121.2865 km, error = -0.073475 km
+Stn 4015, 0.57 GHz, 128.36 km, 75.43 mr, CRYSTAL PALACE[CRY ] - STOW-ON-T.WOLD[STOW], calculated dist = 128.2745 km, error = -0.085452 km
+Stn 4019, 0.57 GHz, 140.83 km, 9.1 mr, CRYSTAL PALACE[CRY ] - ALDEBURGH ENG [ALD ], calculated dist = 140.7372 km, error = -0.092801 km
+Stn 4022, 0.5 GHz, 172.85 km, 8.18 mr, ROWRIDGE ENG  [ROWR] - TORTEVAL  C.I.[TORT], calculated dist = 172.7421 km, error = -0.10787 km
+Stn 4025, 0.57 GHz, 179.39 km, 10.73 mr, CRYSTAL PALACE[CRY ] - EAST HARPTREE [EHP ], calculated dist = 179.2803 km, error = -0.10974 km
+Stn 4029, 0.65 GHz, 193.09 km, 13.94 mr, LE HAVRE      [LEHA] - CHRISTCHURCH E[CHR ], calculated dist = 192.9678 km, error = -0.12218 km
+Stn 4030, 0.77 GHz, 196.06 km, 17.06 mr, SCHEVENINGEN  [SCH ] - BAWDSEY ENG   [BAWD], calculated dist = 195.9338 km, error = -0.12623 km
+Stn 4033, 0.65 GHz, 200.95 km, 27.65 mr, LE HAVRE      [LEHA] - KINGSWOOD ENG [KING], calculated dist = 200.8266 km, error = -0.12342 km
+Stn 4035, 0.51 GHz, 212.02 km, 11.51 mr, CAEN          [CAEN] - CHRISTCHURCH E[CHR ], calculated dist = 211.8892 km, error = -0.13085 km
+Stn 4037, 0.56 GHz, 210.46 km, 23.62 mr, PONTOP PIKE   [PONT] - DORKET HEAD E [DORK], calculated dist = 210.3243 km, error = -0.1357 km
+Stn 4038, 0.56 GHz, 217.68 km, 18.88 mr, SCHEVENINGEN  [SCH ] - TACOLNESTON EN[TACO], calculated dist = 217.5439 km, error = -0.13615 km
+Stn 4039, 0.77 GHz, 218.56 km, 20.16 mr, SCHEVENINGEN  [SCH ] - MANNINGTREE EN[MANN], calculated dist = 218.4194 km, error = -0.14063 km
+Stn 4041, 0.65 GHz, 234.57 km, 22.73 mr, LE HAVRE      [LEHA] - CAVERSHAM ENG [CAVE], calculated dist = 234.4229 km, error = -0.14708 km
+Stn 4045, 0.51 GHz, 259.93 km, 33.4 mr, CAEN          [CAEN] - KINGSWOOD ENG [KING], calculated dist = 259.7718 km, error = -0.15818 km
+Stn 4046, 0.77 GHz, 261.69 km, 36.6 mr, SCHEVENINGEN  [SCH ] - GREAT BADDOW  [BAD ], calculated dist = 261.5303 km, error = -0.15973 km
+Stn 4050, 0.65 GHz, 281.61 km, 28.17 mr, LE HAVRE      [LEHA] - MURSLEY ENG   [MURS], calculated dist = 281.4307 km, error = -0.17932 km
+Stn 4051, 0.51 GHz, 280.68 km, 23.24 mr, CAEN          [CAEN] - CAVERSHAM ENG [CAVE], calculated dist = 280.4997 km, error = -0.18026 km
+Stn 4052, 0.57 GHz, 282.29 km, 23.83 mr, CRYSTAL PALACE[CRY ] - HALWELL ENG   [HALW], calculated dist = 282.1081 km, error = -0.18185 km
+Stn 4054, 0.77 GHz, 307.59 km, 29.35 mr, SCHEVENINGEN  [SCH ] - BROOKMANS PARK[BROO], calculated dist = 307.3955 km, error = -0.1945 km
+Stn 4055, 0.77 GHz, 311.62 km, 35.47 mr, SCHEVENINGEN  [SCH ] - HATFIELD ENG  [HATF], calculated dist = 311.4274 km, error = -0.19262 km
+Stn 4057, 0.77 GHz, 321.4 km, 33.11 mr, SCHEVENINGEN  [SCH ] - KINGSWOOD ENG [KING], calculated dist = 321.2016 km, error = -0.19842 km
+Stn 4059, 0.51 GHz, 332.56 km, 29.08 mr, CAEN          [CAEN] - MURSLEY ENG   [MURS], calculated dist = 332.3479 km, error = -0.21215 km
+Stn 4066, 0.54 GHz, 396.58 km, 34.43 mr, DUESSELDORF   [DUSS] - ALDEBURGH ENG [ALD ], calculated dist = 396.3311 km, error = -0.24894 km
+Stn 4067, 0.54 GHz, 408.81 km, 37.59 mr, DORTMUND      [DORT] - ALDEBURGH ENG [ALD ], calculated dist = 408.5508 km, error = -0.25915 km
+Stn 4068, 0.5 GHz, 408.81 km, 37.59 mr, DORTMUND      [DORT] - ALDEBURGH ENG [ALD ], calculated dist = 408.5508 km, error = -0.25915 km
+Stn 4071, 0.54 GHz, 467.47 km, 43.14 mr, DUESSELDORF   [DUSS] - WICKHAMBROOK E[WICK], calculated dist = 467.1784 km, error = -0.29162 km
+Stn 4078, 0.54 GHz, 599.44 km, 66.18 mr, DUESSELDORF   [DUSS] - BANBURY ENG   [BANB], calculated dist = 599.0627 km, error = -0.37734 km
+Stn 7001, 1.3 GHz, 212.6 km, 20.685 mr, MARTLESHAM    [BTR ] - LEISCHENDAM   [LDM ], calculated dist = 212.5772 km, error = -0.022807 km
+Stn 7002, 1.3 GHz, 298 km, 27.969 mr, MARTLESHAM    [BTR ] - EINDHOVEN     [EH1A], calculated dist = 298.0179 km, error = 0.01792 km
+Stn 7003, 1.3 GHz, 593.8 km, 27.969 mr, MARTLESHAM    [BTR ] - BLAVAND       [BVD ], calculated dist = 593.4829 km, error = -0.31705 km
+Stn 7004, 1.3 GHz, 839.4 km, 93.246 mr, MARTLESHAM    [BTR ] - LYNGBY        [LYA ], calculated dist = 839.4076 km, error = 0.0075565 km
+Stn 7005, 1.3 GHz, 114 km, 11 mr, MARTLESHAM    [BTR ] - LONDON DTI ENG[DTI ], calculated dist = 113.7992 km, error = -0.2008 km
+Stn 7006, 1.3 GHz, 114.4 km, 7.26 mr, MARTLESHAM    [BTR ] - LONDON BT TWR [BTL ], calculated dist = 114.2987 km, error = -0.10131 km
+Stn 7007, 1.3 GHz, 974.4 km, 114.417 mr, MARTLESHAM    [BTR ] - TANUM         [TNM ], calculated dist = 974.3862 km, error = -0.013832 km
+Stn 7008, 1.3 GHz, 199.4 km, 18.59 mr, MARTLESHAM    [BTR ] - SPARSHOLT FIRS[SPR ], calculated dist = 199.4435 km, error = 0.043486 km
+Stn 7009, 1.3 GHz, 259 km, 23.87 mr, MARTLESHAM    [BTR ] - NERA (1)      [NER1], calculated dist = 258.8912 km, error = -0.10881 km
+Stn 7010, 1.3 GHz, 204 km, 18.876 mr, MARTLESHAM    [BTR ] - SCHEVENINGEN  [SCH ], calculated dist = 204.0364 km, error = 0.036445 km
+Stn 7011, 1.3 GHz, 568.4 km, 56.159 mr, MARTLESHAM    [BTR ] - DARMSTADT     [FTZ ], calculated dist = 568.5614 km, error = 0.16138 km
+Stn 7012, 1.3 GHz, 518 km, 52.738 mr, MARTLESHAM    [BTR ] - BREMERHAVEN   [BHN ], calculated dist = 518.5551 km, error = 0.55506 km
+Stn 7014, 1.3 GHz, 394 km, 37.765 mr, MARTLESHAM    [BTR ] - FREMONT POINT [FPJ ], calculated dist = 394.007 km, error = 0.0070485 km
+Stn 7015, 1.3 GHz, 396.3 km, 38.814 mr, MARTLESHAM    [BTR ] - LES TOUILLETS [LTG ], calculated dist = 396.2192 km, error = -0.08082 km
+Stn 7016, 1.3 GHz, 246 km, 20.418 mr, MARTLESHAM    [BTR ] - BREDA         [BDA ], calculated dist = 245.9188 km, error = -0.081184 km
+Stn 7017, 1.3 GHz, 298 km, 26.483 mr, MARTLESHAM    [BTR ] - EINDHOVEN (1B)[EH1B], calculated dist = 298.0179 km, error = 0.01792 km
+Stn 7018, 1.3 GHz, 259 km, 26.197 mr, MARTLESHAM    [BTR ] - NERA (2)      [NER2], calculated dist = 259.5874 km, error = 0.58735 km
+Stn 7019, 1.3 GHz, 259 km, 24.467 mr, MARTLESHAM    [BTR ] - NERA (3)      [NER3], calculated dist = 259.5874 km, error = 0.58735 km
+Stn 7020, 1.3 GHz, 216.7 km, 14.26 mr, KOELN         [KLN ] - LEIDSCHENDAM  [LDM ], calculated dist = 216.6674 km, error = -0.03255 km
+Stn 7021, 1.3 GHz, 115.1 km, 4.52 mr, KOELN         [KLN ] - EINDHOVEN     [EHV2], calculated dist = 114.3877 km, error = -0.71233 km
+Stn 7022, 1.3 GHz, 409.8 km, 38.094 mr, KOELN         [KLN ] - MARTLESHAM    [BTR ], calculated dist = 409.9663 km, error = 0.16634 km
+Stn 7023, 1.3 GHz, 956.5 km, 105.349 mr, MARTLESHAM    [BTR ] - HAMBURG0      [HAM ], calculated dist = 956.9416 km, error = 0.44157 km
+Stn 7026, 6.12 GHz, 222 km, 24.4 mr, BORUPS ALLE   [BOA ] - FREJLEV ALBORG[FRV ], calculated dist = 221.2445 km, error = -0.75551 km
+Stn 7027, 7.48 GHz, 166.2 km, 21.1 mr, SOEHREWALD    [SWD ] - DARMSTADT     [FTZ ], calculated dist = 166.2248 km, error = 0.024767 km
+Stn 7028, 2.65 GHz, 133.7 km, 23 mr, WIESENTHEID   [WTD ] - WOLFSKEHLEN   [WKN ], calculated dist = 133.741 km, error = 0.041015 km
+Stn 7029, 6.67 GHz, 128.5 km, 8.3 mr, KOBLENZ       [KLZ ] - WIESEN        [WSN ], calculated dist = 128.4707 km, error = -0.029316 km
+Stn 7030, 13.24 GHz, 207 km, 16.3 mr, LEISELHEIM    [LSM ] - DARMSTADT     [FTZ ], calculated dist = 206.8792 km, error = -0.12081 km
+Stn 7031, 12.27 GHz, 210.4 km, 9.9 mr, KAISERSTUHL   [KSL ] - DARMSTADT     [FTZ ], calculated dist = 210.1692 km, error = -0.23076 km
+Stn 7032, 11.7 GHz, 145.9 km, 11.5 mr, IRNSUM        [IRN ] - LEIDSCHENDAM  [LDM ], calculated dist = 145.8924 km, error = -0.0075854 km
+Stn 7033, 6.4 GHz, 145.9 km, 11.5 mr, IRNSUM        [IRN ] - LEIDSCHENDAM  [LDM ], calculated dist = 145.8924 km, error = -0.0075854 km
+Stn 7034, 7.3 GHz, 100 km, 4.6 mr, KOOTWIJK      [KWK ] - LEIDSCHENDAM  [LDM ], calculated dist = 99.856 km, error = -0.14399 km
+Stn 7035, 11.37 GHz, 191 km, 16.7 mr, ROCKANJE      [RKJ ] - MARTLESHAM    [BTR ], calculated dist = 190.7731 km, error = -0.22688 km
+Stn 7036, 11.43 GHz, 263 km, 25 mr, STAXTON WOLD  [STX ] - MARTLESHAM    [BTR ], calculated dist = 262.9715 km, error = -0.028519 km
+Stn 7037, 11.41 GHz, 199.8 km, 18.4 mr, SPARSHOLT FIRS[SPR ] - MARTLESHAM    [BTR ], calculated dist = 199.7363 km, error = -0.06368 km
+Stn 7038, 17.71 GHz, 191 km, 16.7 mr, ROCKANJE      [RKJ ] - MARTLESHAM    [BTR ], calculated dist = 190.7731 km, error = -0.22688 km
+Stn 7039, 17.77 GHz, 263 km, 25.9 mr, STAXTON WOLD  [STX ] - MARTLESHAM    [BTR ], calculated dist = 262.9715 km, error = -0.028519 km
+Stn 7041, 1.3 GHz, 152.6 km, 17 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated dist = 153.0309 km, error = 0.43093 km
+Stn 7042, 11.65 GHz, 152.3 km, 35 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated dist = 152.3288 km, error = 0.028791 km
+Stn 7043, 11.65 GHz, 153.2 km, 35 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated dist = 153.0309 km, error = -0.16907 km
+Stn 7044, 1.3 GHz, 160 km, 17 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated dist = 159.9935 km, error = -0.0065408 km
+Stn 7045, 11.65 GHz, 159 km, 35 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated dist = 159.2925 km, error = 0.29245 km
+Stn 7046, 11.65 GHz, 160 km, 35 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated dist = 159.9935 km, error = -0.0065408 km
+Stn 7050, 10.71 GHz, 246 km, 22.19 mr, CNET LANNION  [LAN ] - CHRISTCHURCH E[CHR ], calculated 248.2329 km, error = 2.2329 km -> ### NO PROFILE ###
+Stn 7051, 10.71 GHz, 293.3 km, 23.32 mr, CNET LANNION  [LAN ] - WINCHESTER CRA[WIN ], calculated 295.6146 km, error = 2.3146 km -> ### NO PROFILE ###
+Stn 7052, 11.7 GHz, 103.6 km, 6.32 mr, LEIDSCHENDAM  [LDM ] - EINDHOVEN (3A)[EH3A], calculated dist = 103.5375 km, error = -0.062455 km
+Stn 7053, 1.3 GHz, 66.2 km, 2.68 mr, MARTLESHAM    [BTR ] - GREAT BADDOW  [BAD ], calculated dist = 66.1691 km, error = -0.03092 km
+Stn 7054, 11.2 GHz, 66.2 km, 2.68 mr, GREAT BADDOW  [BAD ] - MARTLESHAM    [BTR ], calculated dist = 66.1691 km, error = -0.03092 km
+Stn 7055, 11.11 GHz, 99.6 km, 11.51 mr, LONDON BT TWR [BTL ] - CHILBOLTON ENG[CBN ], calculated dist = 99.5696 km, error = -0.030437 km
+Stn 7059, 11.7 GHz, 535.2 km, 54.68 mr, LEIDSCHENDAM  [LDM ] - SONDRA H0JRUP [SDH ], calculated dist = 535.2714 km, error = 0.071369 km
+Stn 7061, 29 GHz, 92.7 km, 3.17 mr, KARLSRUHE     [KHR ] - DARMSTADT     [FTZ ], calculated 97.1892 km, error = 4.4892 km -> ### NO PROFILE ###
+Stn 7062, 2.63 GHz, 274.3 km, 33 mr, HEMSBY ENG    [HBY ] - CHILBOLTON ENG[CBN ], calculated dist = 274.3007 km, error = 0.00074829 km
+Stn 7063, 2.17 GHz, 296 km, 45.2 mr, CONCHES       [CCS ] - CHILBOLTON ENG[CBN ], calculated 300.422 km, error = 4.422 km -> ### NO PROFILE ###
+Stn 7069, 3.48 GHz, 278.8 km, 26.5 mr, START POINT EN[STP ] - WEMBLEY ENG   [WEM], calculated dist = 278.8264 km, error = 0.026411 km
+Stn 7070, 9.64 GHz, 278.8 km, 26.5 mr, START POINT EN[STP ] - WEMBLEY ENG   [WEM], calculated dist = 278.8264 km, error = 0.026411 km
+Stn 7072, 3.48 GHz, 398.5 km, 41.2 mr, START POINT EN[STP ] - WITNESHAM ENG [WIT ], calculated 392.9676 km, error = -5.5324 km -> ### NO PROFILE ###
+Stn 7073, 11.37 GHz, 137.8 km, 9.15 mr, BORUPS ALLE   [BOA ] - SONDRA H0JRUP [SDH ], calculated dist = 137.714 km, error = -0.086026 km
+Stn 7079, 1.3 GHz, 169.7 km, 24.38 mr, KOELN         [KLN ] - DARMSTADT     [FTZ ], calculated dist = 169.6945 km, error = -0.0054619 km
+Stn 7080, 10.4 GHz, 169.7 km, 23.58 mr, KOELN         [KLN ] - DARMSTADT     [FTZ ], calculated dist = 169.6945 km, error = -0.0054619 km
+Stn 7081, 1.3 GHz, 240.5 km, 29.77 mr, KOELN         [KLN ] - KARLSRUHE     [KHR ], calculated dist = 240.5372 km, error = 0.037156 km
+Stn 7101, 0.77 GHz, 202.5 km, 18.16 mr, SCHEVENINGEN  [SCH ] - HAPPISBURGH E [HAP ], calculated dist = 202.1424 km, error = -0.35763 km
+Stn 7102, 0.77 GHz, 368.1 km, 36.45 mr, SCHEVENINGEN  [SCH ] - FLAMBOROUGH HD[FLA ], calculated dist = 367.847 km, error = -0.25299 km
+Stn 7103, 0.77 GHz, 541.7 km, 57.85 mr, SCHEVENINGEN  [SCH ] - NEWTON B.T.SEA[NEW ], calculated dist = 541.4635 km, error = -0.23646 km
+Stn 7104, 0.77 GHz, 696.4 km, 76.56 mr, SCHEVENINGEN  [SCH ] - BRIDGE OF DON [BRD ], calculated dist = 696.2824 km, error = -0.11756 km
+Stn 7105, 0.77 GHz, 954.9 km, 104.27 mr, SCHEVENINGEN  [SCH ] - LERWICK SHTLDS[LER ], calculated dist = 953.5114 km, error = -1.3886 km
+Stn 7167, 1.3 GHz, 153.2 km, 10.88 mr, CAP d'ANTIFER [CAR ] - EASTNEY PORTSM[EAS ], calculated 150.6583 km, error = -2.5417 km -> ### NO PROFILE ###
+Stn 9009, 4.69 GHz, 228.8 km, 59 mr, YOUNGSTOWN NY [YOUN] - VERONA ONT    [VERO], calculated dist = 228.661 km, error = -0.139 km
+Stn 9034, 2.17 GHz, 220.11 km, 41 mr, MONROVIA MD   [MONR] - CRAWFORD HILL [CRAW], calculated dist = 219.9691 km, error = -0.14095 km
+Stn 9041, 1.9 GHz, 266.85 km, 16 mr, SCOUSBURGH SCT[SCOU] - MORMOND HILL S[MORM], calculated dist = 266.6862 km, error = -0.16378 km
+Stn 9042, 0.95 GHz, 597.91 km, 64 mr, PENANG        [PENA] - SINGAPORE     [SING], calculated dist = 597.5392 km, error = -0.37077 km
+Stn 9043, 0.9 GHz, 342.4 km, 14 mr, BARBADOS W IN [BARB] - TRINIDAD      [TRIN], calculated dist = 342.1836 km, error = -0.21641 km
+Stn 9045, 1 GHz, 294.98 km, 29 mr, ST PETERSBURG [LENI] - PETROZAVODSK  [PETR], calculated dist = 294.7979 km, error = -0.18207 km
+Stn 9046, 4.48 GHz, 294.98 km, 29 mr, ST PETERSBURG [LENI] - PETROZAVODSK  [PETR], calculated dist = 294.7979 km, error = -0.18207 km
+>>
+

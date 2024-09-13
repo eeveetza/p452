@@ -12,9 +12,11 @@
 % From https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.452-18-202310-I!!ZIP-E.zip
 %    - DN50.TXT
 %    - N050.TXT
+% From https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.2001-4-202109-S!!ZIP-E.zip
+%    - TropoClim.txt
 
 
-files = {'DN50.TXT', 'N050.TXT'};
+files = {'DN50.TXT', 'N050.TXT', 'TropoClim.txt'};
 
 for i  = 1 : length(files)
 
