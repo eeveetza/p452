@@ -14,8 +14,8 @@ Phitn = -60;
 Re = 6371;
 
 
-Hrg = 100;
-Htg = 100;
+Hrg = 1.50;
+Htg = 1.50;
 tropo = false; %when set to true, returns only troposcatter basic tl
 
 Grx = 0;

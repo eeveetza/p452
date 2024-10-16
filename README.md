@@ -19,6 +19,10 @@ The following table describes the structure of the folder `./matlab/`.
 |----------------------------|---------------------------------------------------------------------|
 |`tl_p452.m`                | MATLAB function implementing Recommendation ITU-R P.452-18         |
 |`initiate_digital_maps.m`| MATLAB script that processes the ITU-R maps and generates the necessary functions. It needs to be run prior to using this software implementation. For details, see [Integrating ITU Digital Products](#integrating-itu-digital-products). |
+|`./C3_1_profiles/`   |             Folder containing terrain profiles and measurement files for Terrestrial trans-horizon links in DBSG3 (`CG-3M-2/DBSG3 Repository/Part II Terrestrial trans-horizon.../ III-01)`|
+|`read_C3_1_profile.m`   |             MATLAB script for reading the terrain profile|
+|`read_data_table_C3_1.m`   |             MATLAB script for reading the measurement data|
+|`compute_btl_table_C3_1.m`   |             MATLAB script for computing the basic transmission loss according to ITU-R P.452-18 and the PDR on troposcatter for those paths from table C3_1 which have complete set of input parameters and computes the prediction errors of the two approaches in an Excel file `Results_Table_C3_1_P452.xls`|
 |`validate_p452.m`          | MATLAB script used to validate the implementation of this Recommendation in `tl_p452.m` against the reference data in `validation_examples`.  It works in both MATLAB and Octave on Windows and MacOS.           |
 |`./validation_examples/`    | Folder containing a non-exhaustive set of validation examples, in a form of .csv files, for different terrain profiles, clutter height profiles, frequencies, time-probabilities, etc. They include intermediate and final results of the calculations performed within P.452-18 with the aim of facilitating testing and validation, as well as comparison between different software implementations. |
 |`./private/`   |  Folder containing all the MATLAB routines necessary for the implementation of the propagation model, including the MATLAB implementation of Recommendation ITU-R P.676-11 (computing the specific attenuation due to dry air and water vapor by means of a summation of individual resonance lines from oxigen and water vapor). This folder contains test functions used to verify the current implementation of the model. It also contains several files with path profile data used in testing.|
@@ -91,8 +95,7 @@ Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, 
 
 ## Software Versions
 The code was tested and runs on:
-* MATLAB version 2022a 
-* Octave version 6.1.0
+* MATLAB versions 2022a (Windows OS)
 
 ## References
 
