@@ -1,6 +1,6 @@
-function Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, tropo)
+function [Lb, Lbs] = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, pdr_type)
 %tl_p452 basic transmission loss according to ITU-R P.452-18
-%   Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp)
+%   Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, pdr_type)
 %
 %   This is the MAIN function that computes the basic transmission loss not exceeded for p% of time
 %   as defined in ITU-R P.452-18 (Section 4.5) for clear-air conditions. Other functions called from
@@ -30,12 +30,14 @@ function Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e,
 %                 Set to zero for a terminal on a ship or sea platform
 %     press   -   Dry air pressure (hPa)
 %     temp    -   Air temperature (degrees C)
+%     pdr     -   If true, use PDR P.452 with troposcatter from PDR P.617
+%     pdr_type-   1 - theta^2 +4, 2 - theta^2 + 4theta + 4, 3- theta^2 + 7theta + 4
 %
 %     Output parameters:
 %     Lb     -   basic  transmission loss according to ITU-R P.452-18
 %
 %     Example:
-%     Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp)
+%     Lb = tl_p452(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e, phir_n, Gt, Gr, pol, dct, dcr, press, temp, pdr, pdr_type)
 
 
 %     Rev   Date        Author                          Description
@@ -59,6 +61,7 @@ function Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e,
 %     v10   15MAR23     Ivica Stevanovic, OFCOM         Introduced troposcatter prediction model according to 3M/364 Annex 2
 %     v11   25APR23     Ivica Stevanovic, OFCOM         Introduced more efficient interpolation and aligned with the rest of the Recommendation
 %     v12   15NOV23     Ivica Stevanovic, OFCOM         Aligned with ITU-R P.452-18 (distributed clutter model) 
+%     v13   26MAR25     Ivica Stevanovic, OFCOM         Test version for troposcatter model blending from PDR P.617 
 
 % MATLAB Version '9.12.0.1975300 (R2022a) Update 3' used in development of this code
 %
@@ -78,7 +81,7 @@ function Lb = tl_p452_pdr(f, p, d, h, g, zone, htg, hrg, phit_e, phit_n, phir_e,
 
 
 % verify input argument values and limits
-check_limit(f, 0.1, 50.0, 'f [GHz]');
+%check_limit(f, 0.1, 50.0, 'f [GHz]');
 check_limit(p, 0.001, 50, 'p [%]');
 % check_limit(phi_path, -90, 90, 'phi_path [deg]'); todo: check longitudes and latitudes
 check_limit(dct, 0, inf, 'dct [km]');
@@ -265,7 +268,7 @@ else
 
     Hs = surface_altitude_cv(h, d, dt_cv)/1000.0; % in km
     
-    [Lbs, theta_s] = tl_troposcatter(f, dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, Gt, Gr, p, Hs, temp, press);
+    [Lbs, theta_s] = tl_troposcatter(f, dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, Gt, Gr, p, Hs, temp, press, pdr_type);
     Lbs = max(Lbs, Lbfsg);
 end
 
@@ -273,11 +276,8 @@ end
 
 Lb_pol = -5*log10(10.^(-0.2*Lbs) + 10.^(-0.2*Lbam));  % eq (64)
 
-if (tropo)
-    Lb = Lbs;
-else
-    Lb = Lb_pol(pol);
-end
+Lb = Lb_pol(pol);
+
 
 
 return

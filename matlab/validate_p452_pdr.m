@@ -9,6 +9,7 @@
 % Author: Ivica Stevanovic (IS), Federal Office of Communications, Switzerland
 % Revision History:
 % Date            Revision
+% 28MAR24         Testing the blending with PDR P.617
 % 15NOV23         Updated to align with ITU-R P.452-18 (IS)
 % 16FEB22         Created - transliterated validation examples using .csv instead of .xlsx
 %                 Created new validate_p452.m that handles .csv files
@@ -32,6 +33,10 @@ total = 0;
 flag_createlog = 0;
 
 pdr = true;
+
+pdr_type = 1;  label = 'PDR P.452^{0\theta + 4}';    %theta^2 + 4
+%pdr_type = 2; label = 'PDR P.452^{4\theta + 4}';   %theta^2 + 4theta + 4
+%pdr_type = 3; label = 'PDR P.452^{7\theta + 4}';   %theta^2 + 7theta + 4
 
 %% compute the path profile parameters
 s = pwd;
@@ -289,7 +294,7 @@ for iname = 1 : length(filenames)
 
             Hs = surface_altitude_cv(h, d, dt_cv)/1000.0; % in km
 
-            [Lbs(offset + i), theta_s] = tl_troposcatter(ff(i), dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, p452.Gt, p452.Gr, pp(i), Hs, p452.temp, p452.press);
+            [Lbs(offset + i), theta_s] = tl_troposcatter(ff(i), dtot, hts, hrs, ae, theta_e, theta_t, theta_r, phi_cvn, phi_cve, p452.Gt, p452.Gr, pp(i), Hs, p452.temp, p452.press, pdr_type);
 
             %% To avoid under-estimating troposcatter for short paths, limit Lbs (E.17)
             Lbs(offset + i) = max(Lbs(offset + i), Lbfsg(offset + i));
@@ -368,7 +373,7 @@ for iname = 1 : length(filenames)
             p452.dct, ...
             p452.dcr, ...
             p452.press, ...
-            p452.temp, pdr, false);
+            p452.temp, pdr, pdr_type);
 
         out1.Lbfsg(i+offset) = Lbfsg(i)-Lbfsg_ref(i);
         out1.Lb0p(i+offset) = Lb0p(i)-Lb0p_ref(i);

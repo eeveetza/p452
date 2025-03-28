@@ -1,4 +1,4 @@
-function [Lbs, theta] = tl_troposcatter(f, dt, hts, hrs, ae, the, thetat, thetar, phicvn, phicve, Gt, Gr, p, hs, temp, press)
+function [Lbs, theta] = tl_troposcatter(f, dt, hts, hrs, ae, the, thetat, thetar, phicvn, phicve, Gt, Gr, p, hs, temp, press, pdr_type)
 %tl_troposcatter_pdr Troposcatter basic transmission loss
 %   This function computes the troposcatter basic transmission loss
 %   as defined in Section 4.3 
@@ -19,6 +19,9 @@ function [Lbs, theta] = tl_troposcatter(f, dt, hts, hrs, ae, the, thetat, thetar
 %     p       -   Percentage of average year for which predicted basic loss
 %                 is not exceeded (%)
 %     hs      -   height of the earth's surface above sea level (km) 
+%     temp    -   Temperature (deg C)
+%     press   -   Atmospheric pressure (hPa)
+%     pdr_type-   1: theta^2+4, 2:theta^2+4theta+4, 3: theta^2+7theta+4
 %
 %     Output parameters:
 %     Lbs    -   Troposcatter basic transmission loss (dB)
@@ -95,7 +98,17 @@ rho = 3;
 
 Ag = (g_0 + g_w) * dt;  %(9)
 
-Lbs = F + 22.0*log10(fMHz) + 17.5*log10(theta.^2 + 4) + 17.0*log10(dt) + Lc + Ag - Yp;    % (45) with reinstated factor Ag
+Lbs = F + 22.0*log10(fMHz) + 17.0*log10(dt) + Lc + Ag - Yp;    % (45) with reinstated factor Ag
+
+if pdr_type == 1
+    Lbs = Lbs + 17.5*log10(theta.^2 + 4);
+elseif (pdr_type == 2)
+    Lbs = Lbs + 17.5*log10(theta.^2 + 4*theta + 4);
+else
+    Lbs = Lbs + 17.5*log10(theta.^2 + 7*theta + 4);
+end
+
+
 
 return
 end

@@ -1,11 +1,13 @@
 % This script computes the basic transmission loss according to ITU-R
-% P.452-17 (using tl_p452.m) for those path profiles in the table C3_1
+% P.452-18 (using tl_p452.m) for those path profiles in the table C3_1
 % which have complete set of input parameters.
 % 1) The script reads the data from table C3_1 including the measured basic
 % transmission losses using read_data_table_C3_1()
 % 2) The script also reads the terrain profile data from
 % the folder ./C3_1_profiles/*.csv provided by Stephen Salamon using
-% read_C3_1_profile()
+% read_C3_1_profile() - Note that these profiles are SRTM, they are used in
+% lieu of bare terrain (h_i) and no additional clutter heights were
+% considered (i.e., g_i = h_i)
 % 3) Basic transmission loss computatins are performed only for the terrain
 % profile data for which the complete information (including antenna
 % heights above ground at Tx/Rx site) is available. Other profiles are
@@ -19,13 +21,19 @@ clc
 rd = 1;
 
 % discard the results with deviation larger than discard
-discard = 25;
+discard = 1000;
 
+%pdr_type = 1;  label = 'PDR P.452^{0\theta + 4}';    %theta^2 + 4
+%pdr_type = 2; label = 'PDR P.452^{4\theta + 4}';   %theta^2 + 4theta + 4
+pdr_type = 3; label = 'PDR P.452^{7\theta + 4}';   %theta^2 + 7theta + 4
 
 % 1) The script reads the data from table C3_1 including the measured basic
 % transmission losses using read_data_table_C3_1()
 
-filename = 'C3_1_profiles/C3_1_v1clearTransHorizon200703revised201708.xls';
+%filename = 'C3_1_profiles/C3_1_v1clearTransHorizon200703revised201708.xls';
+%filename = 'C3_1_profiles/C3_1_v1clearTransHorizon200703revised201708_50profiles.xlsx';
+filename = 'C3_1_profiles/C3_1_v1clearTransHorizon200703revised201708_62profiles.xlsx';
+
 
 stano = read_data_table_C3_1(filename);
 
@@ -43,7 +51,7 @@ for pp = 1:2 % once with and once without PDR
             
         else
             pdr = true;
-            fprintf(1,'Second round, applying P.452-18 PDR\n');
+            fprintf(1,'Second round, applying PDR.452-18 PDR\n');
         end
         
         % if certain necessary data are not available for a given link, skip
@@ -139,7 +147,7 @@ for pp = 1:2 % once with and once without PDR
             climzone = TropoClim(knorth(1), keast(1));
             % zone    -   Zone type: Coastal land (1), Inland (2) or Sea (3)
             if climzone == 0
-                z(kk) = 3; % see
+                z(kk) = 3; % sea
             else
                 z(kk) = 2; % inland
             end
@@ -182,22 +190,22 @@ for pp = 1:2 % once with and once without PDR
                 Phirn = struct.rx.the;
                 Phite = struct.tx.phi;
                 Phitn = struct.tx.the;
-                Hrg = struct.rx.ahag;
-                Htg = struct.tx.ahag;
-                Grx = struct.rx.g;
-                Gtx = struct.tx.g;
-                %         Hrg = stano{i}.rx.ahag;
-                %         Htg = stano{i}.tx.ahag;
-                %         Grx = stano{i}.rx.g;
-                %         Gtx = stano{i}.tx.g;
+%                Hrg = struct.rx.ahag;
+%                Htg = struct.tx.ahag;
+%                Grx = struct.rx.g;
+%                Gtx = struct.tx.g;
+                Hrg = stano{i}.rx.ahag;
+                Htg = stano{i}.tx.ahag;
+                Grx = stano{i}.rx.g;
+                Gtx = stano{i}.tx.g;
                 % pol     -   polarization of the signal (1) horizontal, (2) vertical
                 FlagVP = 2;  % vertical polarization
                 dct = 500;
                 dcr = 500;
                 press = 1013;
                 temp = 20;
-
-                Lb = tl_p452_pdr(struct.f, Tpc, struct.d, struct.h, struct.h, z, Htg, Hrg, Phite, Phitn, Phire, Phirn, Gtx, Grx, FlagVP, dct, dcr, press, temp, pdr, false);
+                    
+                Lb = tl_p452_pdr(struct.f, Tpc, struct.d, struct.h, struct.h, z, Htg, Hrg, Phite, Phitn, Phire, Phirn, Gtx, Grx, FlagVP, dct, dcr, press, temp, pdr, pdr_type);
 
                 fprintf(1,'Frequency: %g GHz\n', struct.f);
                 fprintf(1,'Time percentage: %g %%\n', t(it));
@@ -223,9 +231,9 @@ for pp = 1:2 % once with and once without PDR
     end
 
 end
-filename_out = 'Results_Table_C3_1_P452.xls';
+filename_out = ['Results_Table_C3_1_P452_' num2str(pdr_type), '.xls'];
 
-fprintf(1,'%10s  %10s %10s  %10s  %20s  %20s  %20s  %20s  %20s\n','Stat. no.', 'd (km)', 't (%)', 'f(GHz)', 'Measured PL (dB)', 'P.2001 (dB)', 'PDR (dB)', 'PE P.2001 (dB)', 'PE PDR (dB)');
+fprintf(1,'%10s  %10s %10s  %10s  %20s  %20s  %20s  %20s  %20s\n','Stat. no.', 'd (km)', 't (%)', 'f(GHz)', 'Measured PL (dB)', 'P.452 (dB)', 'PDR (dB)', 'PE P.452 (dB)', 'PE PDR (dB)');
 
 A = {'Stat. no.', 't (%)', 'Measured PL (dB)', 'P.452 (dB)', 'PDR (dB)', 'PE P.452 (dB)', 'PE PDR (dB)'};
 
@@ -240,8 +248,8 @@ for kk = 1:length(result{1})
     
 end
 
-tout = [50 30 10 3 1 0.3 0.1 0.03 0.01 0.003 0.001];
-
+%tout = [50 30 10 3 1 0.3 0.1 0.03 0.01 0.003 0.001];
+tout = [50];
 
 if exist(filename_out,'file')
     
@@ -266,7 +274,7 @@ for tt = 1:length(tout)
     B = [B; row];
     row = {'RMSE', ' ', ' ' , ' ', ' ', round(sqrt(mean((delta1).^2)),rd), round(sqrt(mean((delta2).^2)),rd)};
     B = [B; row];
-    xlswrite(filename_out, B, page);
+    writecell(B,  filename_out, 'Sheet', page);
 end
 
 
@@ -294,7 +302,7 @@ hold on
 x = [-50:1:80];
 line(x,pdf(pd_pdr,x),'LineStyle','-.','Color','r');
 lstr2 = ['N(' num2str(pd_pdr.mu) ', ' num2str(pd_pdr.sigma) ')' ];
-legend('P.452-18', lstr1, 'PDR P.452-18', lstr2)
+legend('P.452-18', lstr1, label, lstr2)
 xlabel('PE (dB)')
 ylabel('n.u.')
 grid on
@@ -314,7 +322,7 @@ plot(L_m, L_inf, 'ro');
 plot(L_m, L_m, 'k')
 xlabel('Lb measured (dB)')
 ylabel('Lb simulated (dB)')
-legend('PDR P.452-18', 'P.452-18','measurements', 'Location','southeast')
+legend(label, 'P.452-18','measurements', 'Location','southeast')
 grid on
 
 
