@@ -36,7 +36,7 @@ function varargout = P452(varargin)
 % v5    08OCT21     Ivica Stevanovic, OFCOM    Ensured that series is a row vector in find_intervals.m 
 % v6    24MAR22     Ivica Stevanovic, OFCOM    Introduced path center latitude as input argument instead of Tx/Rx latitudes
 % v7    15NOV23     Ivica Stevanovic, OFCOM    Aligned with ITU-R P.452-18
-% 
+% v8    29AUG26     Ivica Stevanovic, OFCOM    Corrected plotting of clutter and height profiles (now staircases)
 
 % MATLAB Version 9.12.0.1975300 (R2022a) Update 3 used in development of this code
 %
@@ -191,6 +191,10 @@ set(h,'FontSize',handles.p452.titleFontSize);
 % if ~exist('p676_ga.m','file')
 %     addpath([s '/src/'])
 % end
+
+% Force the classic MATLAB light color scheme on this GUI, regardless of
+% the macOS system Dark Mode setting (see forceClassicColors below).
+forceClassicColors(hObject);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1191,7 +1195,33 @@ xx3 = xx(kk);
 yy3 = yy(kk);
 zz3 = zz(kk);
 
-h1=plot(ax,xx, yy);
+% --- Build a centered staircase representation of both the terrain and
+% clutter profiles: the value at each profile sample xc(i) = xx(i) is
+% held constant over the segment [xc(i)-dx(i), xc(i)+dx(i)], where
+% 2*dx(i) is the local sample spacing. Adjacent segments share an edge,
+% so the staircase has no gaps or overlaps even if the sampling is not
+% perfectly uniform. The first and last segments are clipped to the
+% profile limits (x = xx(1) and x = xx(end)) instead of being extended
+% half a step beyond them, so they end up half-width.
+n = numel(xx);
+edges = zeros(n+1,1);
+edges(2:n) = (xx(1:n-1) + xx(2:n)) / 2;   % midpoint between consecutive samples
+edges(1)   = xx(1);                       % clip first segment - no left overhang
+edges(end) = xx(n);                       % clip last segment - no right overhang
+
+xs = zeros(1, 2*n);
+xs(1:2:end) = edges(1:end-1);
+xs(2:2:end) = edges(2:end);
+
+ys = zeros(1, 2*n);   % terrain staircase heights
+ys(1:2:end) = yy;
+ys(2:2:end) = yy;
+
+zs = zeros(1, 2*n);   % clutter staircase heights
+zs(1:2:end) = zz;
+zs(2:2:end) = zz;
+
+h1 = plot(ax, xs, ys);
 set(h1,'Color', 'k','LineWidth',2) % , 'Marker', markers{kk},'MarkerFaceColor', colors{kk})
 
 xlabel(ax,'Distance (km)');
@@ -1200,28 +1230,8 @@ grid(ax, 'on');
 hold(ax, 'on');
 set(ax, 'XLim', [xx(1) xx(end)]);
 
-bits = (yy == zz);
-df = diff(bits);
-k1 = find(df == -1);
-if(~isempty(k1))
-    for idx = 1:length(k1)
-        p = k1(idx);
-        xx = insert(xx, p+1, xx(p));
-        zz = insert(zz, p+1, zz(p+1));
-    end
-end
-
-k2 = find(df == 1);
-
-if(~isempty(k2))
-    for idx = 1:length(k2)
-        p = k2(idx);
-        xx = insert(xx, p+1, xx(p+1));
-        zz = insert(zz, p+2, yy(p));
-    end
-end
-
-h2 = plot(ax,xx,zz);
+h2 = plot(ax, xs, zs);
+set(h2, 'Color', [0.85 0.33 0.10], 'LineWidth', 1.5)
 legend(ax,'Terrain profile', 'Clutter profile')
 hold(ax, 'off');
 guidata(hObject, handles);
@@ -2418,4 +2428,50 @@ function phir_e_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Forces the figure and all its uicontrols/panels to use MATLAB's
+% classic light color scheme, so the GUI is not affected by the macOS
+% system Dark Mode setting (or MATLAB's own dark desktop theme in
+% R2025a+). Call this once, early in the *_OpeningFcn.
+function forceClassicColors(fig)
+
+% If running on R2025a or later, also pin the figure's graphics theme to
+% light. Older releases don't have the theme() function, hence the try/catch.
+try
+    theme(fig,'light');
+catch
+    % theme() not available in this MATLAB release - ignore.
+end
+
+classicGray = get(0,'defaultUicontrolBackgroundColor'); % usually [0.94 0.94 0.94]
+white       = [1 1 1];
+black       = [0 0 0];
+
+set(fig,'Color',classicGray);
+
+h = findall(fig);
+for k = 1:numel(h)
+    obj = h(k);
+
+    if isprop(obj,'Style')
+        style = get(obj,'Style');
+    else
+        style = '';
+    end
+
+    switch class(obj)
+        case 'matlab.ui.control.UIControl'
+            switch style
+                case {'edit','listbox'}
+                    bg = white;
+                otherwise
+                    bg = classicGray;
+            end
+            set(obj,'BackgroundColor',bg,'ForegroundColor',black);
+
+        case {'matlab.ui.container.Panel','matlab.ui.container.ButtonGroup'}
+            set(obj,'BackgroundColor',classicGray,'ForegroundColor',black);
+    end
 end
